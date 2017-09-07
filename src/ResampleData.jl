@@ -1,8 +1,10 @@
 module ResampleData
 
-using DataFrames, Interpolations
+using DataFrames
+include("fitdata.jl")
+include("interpdata.jl")
 
-export aggregate2, time2regular
+export aggregate2, time2regular, interpdf, interp1, fitexp, evalexp
 
 """
 	aggregate2
@@ -132,56 +134,5 @@ function allexcept(head,name)
 	return index;
 end
 
-#"""
-#	interpdf(df,timecol,timvec)
-#
-#Re-sample dataframe applying linear interpolation to all columns
-#
-#**Input**
-#* df: DataFrame where at least one column contains DateTime
-#* timecol: column containing DateTime (no default value)
-#* timevec: output DateTime vector
-#
-#**Output**
-#* dataframe containing all re-sampled columns + timevec
-#
-#**Example**
-#```
-#
-#```
-#"""
-#function interpdf(df::DataFrame,timecol=:datetime,timevec::Vector{DateTime})
-#	# prepare inputs for interpolation
-#	x,xi,dfi = prep2interp(df[timecol],timevec);
-#	for i in names(df)
-#		if i != timecol
-#			if typeof(df[i]) <= Real
-#				dfi[i] = interp1(x,df[i],xi);
-#			end
-#		end
-#	end
-#    return dfi
-#end
-
-"""
-	prep2interp
-"""
-function interp1(x::Vector{DateTime},y::DataArray{Real})
-    itp = Interpolations.interpolate((x,),y,
-            Interpolations.Gridded(Interpolations.Linear()));
-    return minimum(x),maximum(x),itp;
-end
-
-"""
-	prep2interp(dft,timevec)
-
-Auxiliary function to prepare inputs for 1D interpolation
-
-"""
-function prep2interp(dft::DataArray{DateTime},timevec::Vector{DateTime})
-	x = Dates.value.(dft);
-	xi = Dates.value.(timevec);
-	dfi = DataFrame(datetime=timevec);
-end
 
 end #module
