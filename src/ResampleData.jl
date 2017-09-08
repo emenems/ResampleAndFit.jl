@@ -38,7 +38,7 @@ function aggregate2(df::DataFrame;
 					timecol=:datetime,resol=:Dates.Hour(1),
 					fce=sum)
 	# Create a copy of the DateFrame for manipulation
-	dfc = copy(df);
+	dfc = deepcopy(df);
 	# Convert input resolution to string pattern + apply
 	datestringcol = time2pattern(resol);
 	dfc[:datestringcol] = Dates.format.(dfc[timecol],datestringcol);

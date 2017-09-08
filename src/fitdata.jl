@@ -21,7 +21,7 @@ y = p[1] + p[2]\*exp.(p[3].\*x)
 ```
 x = @data(collect(1.:1:10*365)./365);
 y = 1869.9 - 782.*exp.(-0.085.*x) + rand(length(x))*20;
-par,e = fitexp(x,y);
+par,er = fitexp(x,y);
 ```
 """
 function fitexp(x::DataArray{Float64,1},y::DataArray{Float64,1})
@@ -52,8 +52,8 @@ function fitexp(x::DataArray{Float64,1},y::DataArray{Float64,1})
 	# Return estimated parameters
 	return fit.param,LsqFit.estimate_errors(fit, 0.95)
 end
-function fitexp(df::DataFrame,fitcol;timecol=:datetime)
-	x,y = fitprep(df,fitcol,timecol);
+function fitexp(x::DataArray{DateTime,1},y::DataArray{Float64,1})
+	x = convert.(Float64,Dates.value.(x));
 	return fitexp(x,y);
 end
 """
@@ -105,15 +105,10 @@ x0,y0 = fitprep(x,y);
 
 """
 function fitprep(x::DataArray{Float64,1},y::DataArray{Float64,1})
-	x0 = convert(Vector{Float64},x);
-	y0 = convert(Vector{Float64},y);
+	x0 = ResampleData.prepdata(x,to="vector");
+	y0 = ResampleData.prepdata(y,to="vector");
 	r = find(isnan,x0+y0);
 	deleteat!(x0,r);
 	deleteat!(y0,r);
 	return x0,y0;
-end
-function fitprep(df::DataFrame,fitcol;timecol=:datetime)
-	y = ResampleData.prepdata(df[fitcol]);
-	x = convert.(Float64,Dates.value.(df[timecol]));
-	return fitprep(x,y);
 end

@@ -6,7 +6,7 @@ Re-sample dataframe applying linear interpolation to all columns
 
 **Input**
 * df: DataFrame where at least one column contains DateTime
-* timevec: output DateTime vector
+* timevec: output time vector (=DataArray{DateTime,1})
 * timecol: column containing DateTime (default value = :datetime)
 
 **Output**
@@ -21,15 +21,14 @@ dfi = interpdf(df,[DateTime(2010,1,1,12,0,0)]);
 
 ```
 """
-function interpdf(df::DataFrame,timevec::Vector{DateTime};timecol=:datetime)
+function interpdf(df::DataFrame,timevec::DataArray{DateTime,1};timecol=:datetime)
 	# prepare input time vector for interpolation
 	x,xi,dfi = preptime(df[timecol],timevec);
 	# run for all input columns except for DateTime (x vector) and Types not
 	# suitable for interpolation
 	for i in names(df)
-		if i != timecol
-			y = prepdata(df[i]);
-			dfi[i] = interp1(x,y,xi);
+		if (i != timecol) && (eltype(df[i]) <: Real)
+			dfi[i] = interp1(x,prepdata(df[i]),xi);
 		end
 	end
     return dfi
@@ -80,7 +79,7 @@ Auxiliary function to prepare time in DateTime format for interpolation
 Will convert DateTime to Number/Int and declare/create output (length) dataframe
 
 """
-function preptime(dft::DataArray{DateTime},timevec::Vector{DateTime})
+function preptime(dft::DataArray{DateTime,1},timevec::DataArray{DateTime,1})
 	x = Dates.value.(dft);
 	xi = Dates.value.(timevec);
 	dfi = DataFrame(datetime=timevec);
@@ -94,19 +93,15 @@ Auxiliary function to prepare input vector (as DataArray) for interpolation,
 i.e. will convert to Float64 (DataArray) and replace NAs with NaN
 
 """
-function prepdata(y)
+function prepdata(y;to="da")
 	# Interpolation output must be Float64 regardless of input type
-	out = @data(Vector{Float64}(length(y)));
-	if eltype(y) == Float64
+	if to == "da" # "da" = dataarray
+		out = @data(Vector{Float64}(length(y)));
+	else # otherwise just vector (array)
+		out = Vector{Float64}(length(y));
+	end
+	if eltype(y) <: Real
 		# Replace NA before interpolation (only if present)
-		if sum(isna.(y)) > 0
-			out = convert(Array,y,NaN);
-		else
-			out = df[i];
-		end
-	elseif eltype(y) == Int64
-		# Conversion from Int using 'convert' fce would return Error as NaN is
-		# a Float64
 		for (i,v) in enumerate(y)
 			if isna(v)
 				out[i] = NaN;

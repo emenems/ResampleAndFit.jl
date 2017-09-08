@@ -24,14 +24,14 @@ reg_sample = time2regular(df,timecol=:datetime,resol=Dates.Hour(6))
 df = DataFrame(Temp=[10,11,12,14],Humi=@data([40.,NA,50,60]),
       datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
       DateTime(2010,1,1,2),DateTime(2010,1,1,4)]);
-dfi = interpdf(df,[DateTime(2010,1,1,0,30,0),DateTime(2010,1,1,12,0,0)]);
+dfi = interpdf(df,@data([DateTime(2010,1,1,0,30,0),DateTime(2010,1,1,12,0,0)]));
 @test dfi[:Temp][1] ≈ 10.5
 @test isna(dfi[:Humi][1])
 @test isna(dfi[:Humi][2])
 @test isna(dfi[:Temp][2])
 
 # interp1
-@test interp1([1,2,3,4],[10,20,30,40],1.5) ≈ @data([15.])
+@test interp1(@data([1,2,3,4]),@data([10,20,30,40]),@data([1.5])) ≈ @data([15.])
 
 # fitexp
 x = @data(collect(1.:1:10*365)./365);
