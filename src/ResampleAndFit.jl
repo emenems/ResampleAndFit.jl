@@ -1,10 +1,12 @@
-module ResampleData
+module ResampleAndFit
 
 using DataFrames
 include("fitdata.jl")
 include("interpdata.jl")
 
-export aggregate2, time2regular, interpdf, interp1, fitexp, evalexp
+export aggregate2, time2regular
+export interpdf, interp1
+export fitexp, evalexp, fitpoly, evalpoly
 
 """
 	aggregate2

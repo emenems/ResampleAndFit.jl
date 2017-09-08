@@ -1,4 +1,4 @@
-using ResampleData, Base.Test, DataFrames
+using ResampleAndFit, Base.Test, DataFrames
 
 # aggregate2: find minimum including NAs
 df = DataFrame(Temp=@data([10,11,14,1,2,NA,4]),
@@ -35,13 +35,23 @@ dfi = interpdf(df,@data([DateTime(2010,1,1,0,30,0),DateTime(2010,1,1,12,0,0)]));
 
 # fitexp
 x = @data(collect(1.:1:10*365)./365);
-y = 1869.9 -782.*exp.(-0.085.*x);
+y = 1869.9 - 782.*exp.(-0.085.*x);
 par,er = fitexp(x,y);
 @test round(sum(par*10)) ≈ round(18699-7820-0.85)
 @test sum(er) < 1e-2
 
-# fiteval
+# evalexp
 @test evalexp(@data([3.]),[10.,0.5,0.05]) ≈ @data([10. + 0.5*exp(0.05*3.)])
 
+# fitpoly
+x = @data(collect(1.:1:365));
+y = 10. + 0.1*x + rand(length(x))/20;
+par,er = fitpoly(x,y,deg=1);
+@test par[1] ≈ 0.1 atol=0.001
+@test par[2] ≈ 10. atol=0.1
+@test sum(er) < 1e-2
+
+# evalpoly
+@test evalpoly([10.],[0.01, 0.1, 1.0]) ≈ [1+0.1*10+0.01*10*10]
 
 println("End test");

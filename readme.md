@@ -1,4 +1,4 @@
-ResampleData
+ResampleAndFit
 ============
 This repository contains functions related to (time) re-sampling of DataFrames and simple curve fitting.
 
@@ -14,6 +14,7 @@ Auxiliary functions are available allowing to:
 * `fitexp`: fit exponential curve with an offset (a + b\*exp(c\*t))
 * `evalexp`: compute exponential curve with offset giving its parameters (a,b,c)
 * `fitpoly`: fit polynomials just like in _Matlab/polyfit_
+* `evalpoly`: compute polynomial using input parameters
 > use `LsqFit.curve_fit` for other fitting curves
 
 
