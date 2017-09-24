@@ -17,6 +17,12 @@ Auxiliary functions are available allowing to:
 * `evalpoly`: compute polynomial using input parameters
 > use `LsqFit.curve_fit` for other fitting curves
 
+## Filter options:
+* ``
+
+Auxiliary functions:
+`findblocks`: find time intervals (block) without NaNs (e.g. to allow for piecewise filtering)
+`mmconv`: convolution + setting edges affected by filter to NaN values 
 
 ## Usage
 * Check the function help for instructions and example usage

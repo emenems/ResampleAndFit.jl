@@ -3,10 +3,12 @@ module ResampleAndFit
 using DataFrames
 include("fitdata.jl")
 include("interpdata.jl")
+include("filtdata.jl")
 
 export aggregate2, time2regular
 export interpdf, interp1
 export fitexp, evalexp, fitpoly, evalpoly
+export mmconv, convindices, findblocks
 
 """
 	aggregate2
@@ -16,7 +18,7 @@ Simple aggregation = sum, mean, maximum or minimum can be applied during re-samp
 Missing (NA) data can be either kept or replaced during re-sampling.
 
 **Input**
-* df: DataFrame where at least one column contains DateTime
+* data: DataFrame where at least one column contains DateTime
 * timecol: column containing DateTime. Default column name = :datetime
 * resol: output (date)time resolution, e.g. Dates.Hour(1) (default).
 > Dates.Hour(2) is not allowed (only ONE hour|minute|...)
@@ -30,17 +32,17 @@ Missing (NA) data can be either kept or replaced during re-sampling.
 
 **Example**
 ```
-df = DataFrame(Temp=[10,11,12,14],
+data = DataFrame(Temp=[10,11,12,14],
        datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
          DateTime(2010,1,1,2),DateTime(2010,1,1,4)]);
-dfa = aggregate2(df,resol=Dates.Day(1),fce=x->minimum(dropna(x)));
+dataa = aggregate2(data,resol=Dates.Day(1),fce=x->minimum(dropna(x)));
 ```
 """
-function aggregate2(df::DataFrame;
+function aggregate2(data::DataFrame;
 					timecol=:datetime,resol=:Dates.Hour(1),
 					fce=sum)
 	# Create a copy of the DateFrame for manipulation
-	dfc = deepcopy(df);
+	dfc = deepcopy(data);
 	# Convert input resolution to string pattern + apply
 	datestringcol = time2pattern(resol);
 	dfc[:datestringcol] = Dates.format.(dfc[timecol],datestringcol);
@@ -84,12 +86,12 @@ function time2pattern(resol)
 end
 
 """
-	time2regular(df,timecol,resol)
+	time2regular(data,timecol,resol)
 
 Resample data to regular time sampling (missing filled with NA values)
 
 **Input**
-* df: DataFrame where at least one column contains DateTime
+* data: DataFrame where at least one column contains DateTime
 * timecol: column containing DateTime. Default column name = :datetime
 * resol: output (date)time resolution, e.g. Dates.Hour(1)
 
@@ -98,18 +100,18 @@ Resample data to regular time sampling (missing filled with NA values)
 
 **Example**
 ```
-df = DataFrame(Temp=[10,11,12,14],
+data = DataFrame(Temp=[10,11,12,14],
 			datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
 			DateTime(2010,1,1,2),DateTime(2010,1,1,4)]);
-reg_sample = time2regular(df,timecol=:datetime,resol=Dates.Hour(1))
+reg_sample = time2regular(data,timecol=:datetime,resol=Dates.Hour(1))
 
 ```
 """
-function time2regular(df::DataFrame;timecol=:datetime,resol=Dates.Hour(1))
+function time2regular(data::DataFrame;timecol=:datetime,resol=Dates.Hour(1))
 	# create dataframe with regular sampling
-	dfr = DataFrame(datetime=collect(df[timecol][1]:resol:df[timecol][end]));
+	dfr = DataFrame(datetime=collect(data[timecol][1]:resol:data[timecol][end]));
 	# joint original and regular sampled dataframe
-	reg_sample = join(df,dfr,on=timecol,kind=:right);
+	reg_sample = join(data,dfr,on=timecol,kind=:right);
 	# Sort accoring to time
 	return sort!(reg_sample, cols=timecol);
 end

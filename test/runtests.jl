@@ -54,4 +54,7 @@ par,er = fitpoly(x,y,deg=1);
 # evalpoly
 @test evalpoly([10.],[0.01, 0.1, 1.0]) ≈ [1+0.1*10+0.01*10*10]
 
+# filtdata
+include("filtdata_test.jl")
+
 println("End test");

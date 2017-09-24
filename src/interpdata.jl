@@ -1,11 +1,11 @@
 import Interpolations
 """
-	interpdf(df,timecol,timvec)
+	interpdf(data,timecol,timvec)
 
 Re-sample dataframe applying linear interpolation to all columns
 
 **Input**
-* df: DataFrame where at least one column contains DateTime
+* data: DataFrame where at least one column contains DateTime
 * timevec: output time vector (=DataArray{DateTime,1})
 * timecol: column containing DateTime (default value = :datetime)
 
@@ -14,21 +14,21 @@ Re-sample dataframe applying linear interpolation to all columns
 
 **Example**
 ```
-df = DataFrame(Temp=[10,11,12,14],
+data = DataFrame(Temp=[10,11,12,14],
 			datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
 			DateTime(2010,1,1,2),DateTime(2010,1,1,4)]);
-dfi = interpdf(df,[DateTime(2010,1,1,12,0,0)]);
+datai = interpdf(data,[DateTime(2010,1,1,12,0,0)]);
 
 ```
 """
-function interpdf(df::DataFrame,timevec::DataArray{DateTime,1};timecol=:datetime)
+function interpdf(data::DataFrame,timevec::DataArray{DateTime,1};timecol=:datetime)
 	# prepare input time vector for interpolation
-	x,xi,dfi = preptime(df[timecol],timevec);
+	x,xi,dfi = preptime(data[timecol],timevec);
 	# run for all input columns except for DateTime (x vector) and Types not
 	# suitable for interpolation
-	for i in names(df)
-		if (i != timecol) && (eltype(df[i]) <: Real)
-			dfi[i] = interp1(x,prepdata(df[i]),xi);
+	for i in names(data)
+		if (i != timecol) && (eltype(data[i]) <: Real)
+			dfi[i] = interp1(x,prepdata(data[i]),xi);
 		end
 	end
     return dfi
