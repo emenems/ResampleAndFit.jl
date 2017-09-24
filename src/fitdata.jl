@@ -102,8 +102,8 @@ x0,y0 = fitprep(x,y);
 
 """
 function fitprep(x::DataArray{Float64,1},y::DataArray{Float64,1})
-	x0 = ResampleAndFit.prepdata(x,to="vector");
-	y0 = ResampleAndFit.prepdata(y,to="vector");
+	x0 = convert(Vector{Float64},x,NaN);
+	y0 = convert(Vector{Float64},y,NaN);
 	r = find(isnan,x0+y0);
 	deleteat!(x0,r);
 	deleteat!(y0,r);

@@ -19,11 +19,16 @@ function test_findblocks()
 	start,stop = findblocks(invec);
 	@test start == [1,7,13,15];
 	@test stop == [5,9,13,16];
+	# Add NaN to the first position
 	invec[1] = NaN;
 	invec = vcat(invec,[18]);
 	start2,stop2 = findblocks(invec);
 	@test start2 == [2,7,13,15,18];
 	@test stop2 == [5,9,13,16,18];
+	# Test DataArray input without NaNs
+	start3,stop3 = findblocks(@data([1.,2.,3.,4.,5.]));
+	@test start3 == [1];
+	@test stop3 == [5]
 end
 
 # run

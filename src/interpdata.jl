@@ -28,7 +28,7 @@ function interpdf(data::DataFrame,timevec::DataArray{DateTime,1};timecol=:dateti
 	# suitable for interpolation
 	for i in names(data)
 		if (i != timecol) && (eltype(data[i]) <: Real)
-			dfi[i] = interp1(x,prepdata(data[i]),xi);
+			dfi[i] = interp1(x,data[i],xi);
 		end
 	end
     return dfi
@@ -62,11 +62,8 @@ function interp1(x,y,xi)
 	for i = 1:length(out)
         if (xi[i] <= maxx) && (xi[i] >= minx)
             out[i] = itp[xi[i]];
-			if isnan(out[i])
-				out[i] = NA;
-			end
 		else
-			out[i] = NA;
+			out[i] = NaN;
         end
     end
     return out;
@@ -84,31 +81,4 @@ function preptime(dft::DataArray{DateTime,1},timevec::DataArray{DateTime,1})
 	xi = Dates.value.(timevec);
 	dfi = DataFrame(datetime=timevec);
 	return x, xi, dfi
-end
-
-"""
-	prepdata(y)
-
-Auxiliary function to prepare input vector (as DataArray) for interpolation,
-i.e. will convert to Float64 (DataArray) and replace NAs with NaN
-
-"""
-function prepdata(y;to="da")
-	# Interpolation output must be Float64 regardless of input type
-	if to == "da" # "da" = dataarray
-		out = @data(Vector{Float64}(length(y)));
-	else # otherwise just vector (array)
-		out = Vector{Float64}(length(y));
-	end
-	if eltype(y) <: Real
-		# Replace NA before interpolation (only if present)
-		for (i,v) in enumerate(y)
-			if isna(v)
-				out[i] = NaN;
-			else
-				out[i] = v;
-			end
-		end
-	end
-	return out
 end

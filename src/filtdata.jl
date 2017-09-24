@@ -27,7 +27,7 @@ function mmconv(sig::Vector{Float64},imp::Vector{Float64})
 	return outsig[outind];
 end
 function mmconv(sig::DataArray,imp::Vector{Float64})
-	mmconv(ResampleAndFit.prepdata(sig),imp);
+	mmconv(convert(Vector{Float64},sig,NaN),imp);
 end
 
 """
@@ -78,6 +78,20 @@ istart,istop = findblocks(invec);
 """
 function findblocks(invec::Vector{Float64})
 	idall = find(isnan.(invec));
+	findblocks_decide(idall,length(invec));
+end
+function findblocks(invec::DataArray)
+	idall = find(isna.(invec));
+	findblocks_decide(idall,length(invec));
+end
+function findblocks_decide(idall::Vector{Int},length_invec::Int)
+	if !isempty(idall)
+		return findblocks_main(idall,length_invec);
+	else
+		return [1],[length_invec]
+	end
+end
+function findblocks_main(idall::Vector{Int},length_invec::Int)
 	idstart = Vector{Int}(0);
 	idstop = Vector{Int}(0);
 	for i in 1:length(idall)
@@ -91,12 +105,9 @@ function findblocks(invec::Vector{Float64})
 			push!(idstop,idall[i]-1)
 		end
 	end
-	if idall[end] != length(invec)
+	if idall[end] != length_invec
 		push!(idstart,idall[end]+1);
-		push!(idstop,length(invec));
+		push!(idstop,length_invec);
 	end
 	return idstart,idstop
-end
-function findblocks(invec::DataArray)
-	return findblocks(ResampleAndFit.prepdata(invec));
 end

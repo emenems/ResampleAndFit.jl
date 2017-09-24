@@ -3,7 +3,7 @@
 
 Aggregate data to yearly, monthly, daily, hourly or ONE minute samples.
 Simple aggregation = sum, mean, maximum or minimum can be applied during re-sampling.
-Missing (NA) data can be either kept or replaced during re-sampling.
+Missing (NaN) data can be either kept or replaced during re-sampling.
 
 **Input**
 * data: DataFrame where at least one column contains DateTime
@@ -12,7 +12,7 @@ Missing (NA) data can be either kept or replaced during re-sampling.
 > Dates.Hour(2) is not allowed (only ONE hour|minute|...)
 
 * fce: function to by applied = sum (default)| mean | maximum | minimum
-> To remove NaNs use `x->sum(dropna(x))` function
+> To remove NaNs use `x->sum(filter(!isnan,x))` function
 
 **Output**
 * resampled dataframe with all input columns
