@@ -25,6 +25,8 @@ function test_findblocks()
 	@test start2 == [2,7,13,15,18];
 	@test stop2 == [5,9,13,16,18];
 end
+
+# run
 test_mmconv();
 test_convindices();
 test_findblocks();
