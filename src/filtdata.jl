@@ -6,58 +6,55 @@ Cutting of edges is the only difference between Julias `conv` and this function
 **Input:**
 * sig: signal to be filtered (vector)
 * imp: filter = impulse response (vector)
+> length of `imp` must be an odd number
 
 **Output**
-* outsig: filtered 'valid' input signal, i.e., not effected by filter edge effect
-* outind: valid indices (can be used to cut, for example, time vector that is not
-		on input)
+* outsig: filtered 'valid' input signal, i.e., NaNs where filter/edge effect
+  (same length as `sig`)
 
 **Example**
 ```
 t = collect(1:1:400.);
 s = sin.(2*pi*1/50.*t) + randn(length(t))./6;
 sf = mmconv(s,ones(7)./7);
-ii = convindices(length(s),7);
-#using PyPlot;plot(t,s,t[ii],sf)
 ```
 """
 function mmconv(sig::Vector{Float64},imp::Vector{Float64})
 	outsig = conv(sig,imp);
-	outind = convindices(length(sig),length(imp),cutto="valid");
-	return outsig[outind];
+	return correctconv(outsig,length(imp));
 end
 function mmconv(sig::DataArray,imp::Vector{Float64})
-	mmconv(convert(Vector{Float64},sig,NaN),imp);
+	@data(mmconv(convert(Vector{Float64},sig,NaN),imp));
 end
 
 """
-Returns indices for convolved signal for cutting vector to output signal without
-phase shift or without phase shift and values affected by filter edge effect
+	correctconv(sig,impl)
+Correct phase shift and edge effect (replace by NaNs)
 **Input**
-* sigl: length of input signal
+* sig: signal to be filtered (vector)
 * impl: length of impulse response (=filter length)
-* cutto: switch to eithe return indices without "phase" shift (default) or
-  without "phase" + filter edge effect (="valid")
+> `impl` must be odd number
 
 **Output**
-* valid indices range
+* valid output signal
 
 **Example**
 ```
 sig = [1.,2.,3.,4.,3.,2.,1.,0.,-1];
 imp = [1/3,1/3,1/3];
-outind = convindices(length(sig),length(imp));
+outsig = correctconv(sig,length(imp));
 ```
 """
-function convindices(sigl::Int,impl::Int;cutto::String="phase")
-	if cutto == "valid"
-		return impl:1:sigl-impl;
-	elseif cutto == "phase"
-		return 1+round(Int,(impl-1)/2):1:sigl-round(Int,(impl-1)/2);
-	else
-		return 1:1:sigl;
-	end
+function correctconv(sig::Vector{Float64},impl::Int)
+	temp = round(Int,(impl-1)/2);
+	# Remove phase shift
+	out = sig[1+temp:end-temp];
+	# Remove filter/edge effect
+	out[1:temp] = NaN; # left
+	out[end-temp+1:end] = NaN; # right
+	return out;
 end
+
 
 """
 	findblocks(invec)
@@ -110,4 +107,33 @@ function findblocks_main(idall::Vector{Int},length_invec::Int)
 		push!(idstop,length_invec);
 	end
 	return idstart,idstop
+end
+
+"""
+	filtblocks(sig,imp)
+Filter signal assuming input time series contains NaNs. Thus, piecewise filtering
+of the input singal will be applied (`mmconv` will be utilized).  
+
+See `mmconv` help for **Input** and **Output**
+
+**Example**
+```
+t = collect(1:1:100.);
+s = sin.(2*pi*1/20.*t) + randn(length(t))./6;
+s[40:49] = NaN;
+sf = filtblocks(s,ones(5)./5);
+```
+"""
+function filtblocks(sig::Vector{Float64},imp::Vector{Float64})
+	id1,id2 = findblocks(sig);
+	out = Vector{Float64}(length(sig)).+NaN;
+	for i in 1:1:length(id1)
+		if id2[i]-id1[i] > length(imp)*2.
+			out[id1[i]:id2[i]] = mmconv(sig[id1[i]:id2[i]],imp);
+		end
+	end
+	return out
+end
+function filtblocks(sig::DataArray,imp::Vector{Float64})
+	@data(filtblocks(convert(Vector{Float64},sig,NaN),imp));
 end

@@ -9,6 +9,6 @@ include("filtdata.jl")
 export aggregate2, time2regular
 export interpdf, interp1
 export fitexp, evalexp, fitpoly, evalpoly
-export mmconv, convindices, findblocks
+export mmconv, findblocks, filtblocks
 
 end #module

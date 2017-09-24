@@ -1,19 +1,15 @@
-function test_mmconv()
+function mmconv_test()
 	sig = ones(15);
 	imp = ones(5)./5;
 	filtsig = mmconv(sig,imp);
-	@test sum(filtsig) ≈ 15.-5*2+1.
-	@test length(filtsig) == 6
+	@test sum(filter(!isnan,filtsig)) ≈ 11.
+	for i in [1,2,14,15]
+		@test isnan(filtsig[i])
+	end
+	@test length(filtsig) == 15
 end
 
-function test_convindices()
-	ii = convindices(15,5);
-	@test ii == 3:1:13
-	ii = convindices(15,5,cutto="valid");
-	@test ii == 5:1:10
-end
-
-function test_findblocks()
+function findblocks_test()
 	invec = collect(1.:1:17.);
 	invec[[6,10,11,12,14,17]] = NaN;
 	start,stop = findblocks(invec);
@@ -31,7 +27,16 @@ function test_findblocks()
 	@test stop3 == [5]
 end
 
+function filtblocks_test()
+	sig = vcat(ones(10),NaN,ones(12).+1);
+	out = filtblocks(sig,ones(3)./3);
+	for i in [1,10,11,12,length(sig)]
+		@test isnan(out[i])
+	end
+	@test sum(filter(!isnan,out)) ≈ 8.+10.*2.
+end
+
 # run
-test_mmconv();
-test_convindices();
-test_findblocks();
+mmconv_test();
+findblocks_test();
+filtblocks_test();
