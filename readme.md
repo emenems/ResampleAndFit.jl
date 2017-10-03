@@ -9,6 +9,7 @@ This repository contains functions related to (time) **re-sampling** of DataFram
 
 _Auxiliary functions_:  
 * `interp1`: linearly interpolate DataArray to a required time (datetime) vector (DataArray)
+* `isregular`: check if the input time vector (data) is regularly sampled
 
 ## Fitting options:
 * `fitexp`: fit exponential curve with an offset (a + b\*exp(c\*t))

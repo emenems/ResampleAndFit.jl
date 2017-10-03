@@ -27,7 +27,7 @@ dataa = aggregate2(data,resol=Dates.Day(1),fce=x->minimum(dropna(x)));
 ```
 """
 function aggregate2(data::DataFrame;
-					timecol=:datetime,resol=:Dates.Hour(1),
+					timecol=:datetime,resol=Dates.Hour(1),
 					fce=sum)
 	# Create a copy of the DateFrame for manipulation
 	dfc = deepcopy(data);
@@ -103,6 +103,38 @@ function time2regular(data::DataFrame;timecol=:datetime,resol=Dates.Hour(1))
 	# Sort accoring to time
 	return sort!(reg_sample, cols=timecol);
 end
+
+
+"""
+	isregular(timevec)
+
+Check if the data/time vector is regularly sampled
+
+**Input**
+`timevec`: DataArray with DateTime
+
+**Output**
+`true` for regularly sampled data
+
+**Example**
+```
+timevec = @data([DateTime(2010,1,1,1,0,0),
+				 DateTime(2010,1,1,2,0,0),
+				 DateTime(2010,1,1,3,0,0),
+				 DateTime(2010,1,1,5,0,0),# fourth hour is missing =>not regular
+				 DateTime(2010,1,1,6,0,0)]);
+out = isregular(timevec); # will return false
+```
+"""
+function isregular(timevec::DataArray{DateTime,1})
+	timediff = diff(Dates.value.(timevec));
+	if all(timediff[1] .== timediff)
+		return true;
+	else
+		return false;
+	end
+end
+
 
 """
 	allexept(name)
