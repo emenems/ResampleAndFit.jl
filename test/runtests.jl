@@ -4,7 +4,8 @@ using ResampleAndFit, Base.Test, DataFrames
 tests = ["filtdata_test.jl",
 		 "resampledata_test.jl",
 		 "interpdata_test.jl",
-		 "fitdata_test.jl"];
+		 "fitdata_test.jl",
+		 "fillnans_test.jl"];
 # Run all tests in the list
 for i in tests
 	include(i)

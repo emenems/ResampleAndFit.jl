@@ -5,7 +5,8 @@ This repository contains functions related to (time) **re-sampling** of DataFram
 ## Re-sampling options:
 * `aggregate2`: aggregate data, i.e. compute sum, mean or other function, to a required time sampling. The input DataFrame is re-sampled and new DataFrame with required time resolution is created  
 * `interpdf`: linearly interpolate values in DataFrame to a new time resolutin (=new DataFrame)
-* `time2regular`: re-sample data in such a way that the output DataFrame contains values with constant (regular) sampling (missing values are filled with NAs)  
+* `time2regular`: re-sample data in such a way that the output DataFrame contains values with constant (regular) sampling (missing values are filled with NaNs)  
+* `fillnans`: replace NaN values by linearly interpolated values as long as the missing interval is shorter than given (input) maximum gap
 
 _Auxiliary functions_:  
 * `interp1`: linearly interpolate DataArray to a required time (datetime) vector (DataArray)
