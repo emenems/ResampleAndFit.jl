@@ -29,11 +29,7 @@ dataa = aggregate2(data,resol=Dates.Day(1),fce=x->minimum(dropna(x)));
 function aggregate2(data::DataFrame;
 					timecol=:datetime,resol=Dates.Hour(1),
 					fce=sum)
-	# Create a copy of the DateFrame for manipulation
-	dfc = deepcopy(data);
-	# Convert input resolution to string pattern + apply
-	datestringcol = time2pattern(resol);
-	dfc[:datestringcol] = Dates.format.(dfc[timecol],datestringcol);
+	dfc,datestringcol = addTimeString(data,resol,timecol);
 	# do not use datetime for aggregation (not supported)
 	useonly = allexcept(names(dfc),timecol);
 	dfc = aggregate(dfc[useonly],:datestringcol,fce)
@@ -137,6 +133,45 @@ end
 
 
 """
+	getresolution(timevec;timecol)
+Get time resolution in `Dates` format
+NOT tested yet.
+
+**Input:**
+`timevec`: vector/DataArray with DateTime values
+
+**Output:**
+time resolution in `Dates` format. Will return one of following:
+Dates.Millisecond(X) | Dates.Second(X) | Dates.Minute(X) | Dates.Hour(X) |
+Dates.Day(X),  where X <0,10>
+
+**Example:**
+```
+timevec = @data([DateTime(2010,1,1,1,0,0),
+				 DateTime(2010,1,1,2,0,0),
+				 DateTime(2010,1,1,3,0,0)]);
+resol = getresolution(timevec); # should return Dates.Hour(1);
+```
+"""
+function getresolution(timevec::DataArray{DateTime})
+	dt = timevec[2]-timevec[1];
+	if dt < Dates.Millisecond(1000) # millisecond
+		return dt;
+	elseif dt < Dates.Millisecond(60*1000) # seconds
+		return Dates.Second(dt)
+	elseif dt < Dates.Millisecond(60*60*1000) # minute
+		return Dates.Minute(dt)
+	elseif dt < Dates.Millisecond(24*60*60*1000) # hour
+		return Dates.Hour(dt)
+	elseif dt < Dates.Millisecond(24*60*60*60*1000) # day
+		return Dates.Day(1)
+	else
+		return dt;
+	end
+end
+
+
+"""
 	allexept(name)
 
 Auxiliary function to return all column numbers except for input name
@@ -156,4 +191,17 @@ function allexcept(head,name)
 		end
 	end
 	return index;
+end
+
+"""
+Auxiliary function to prepare dataframe for aggregate2 and timejoin
+"""
+function addTimeString(data,resol,timecol)
+	# Create a copy of the DateFrame for manipulation
+	dfc = deepcopy(data);
+	# Convert input resolution to string pattern + apply
+	datestringcol = time2pattern(resol);
+	# Append column with string date/time
+	dfc[:datestringcol] = Dates.format.(data[timecol],datestringcol);
+	return dfc,datestringcol
 end

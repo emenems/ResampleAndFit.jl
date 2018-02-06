@@ -14,5 +14,24 @@ end
 function interp1_test()
 	@test interp1(@data([1,2,3,4]),@data([10,20,30,40]),@data([1.5])) ≈ @data([15.])
 end
+
+# mesghrid + mesh2vec
+function meshgrid_test()
+	# meshgrid
+	x = [1,2,3,4];
+	y = [10,20,30,40];
+	xi,yi = meshgrid(x,y)
+	@test xi[2,3] == 3.0
+	@test yi[2,3] == 20.0
+
+	# mesh2vec
+	xi = [1 2 3 4; 1 2 3 4; 1 2 3 4; 1 2 3 4];
+	yi = [10 10 10 10; 20 20 20 20; 30 30 30 30; 40 40 40 40];
+	x,y = mesh2vec(xi,yi);
+	@test x[end] == 4
+	@test y[1] == 10
+end
+
 interpdf_test()
 interp1_test()
+meshgrid_test()

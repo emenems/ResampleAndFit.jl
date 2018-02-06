@@ -7,8 +7,8 @@ include("interpdata.jl")
 include("filtdata.jl")
 include("fillnans.jl")
 
-export aggregate2, time2regular, isregular
-export interpdf, interp1
+export aggregate2, time2regular, isregular, getresolution
+export interpdf, interp1, meshgrid, mesh2vec
 export fitexp, evalexp, fitpoly, evalpoly
 export mmconv, findblocks, filtblocks
 export fillnans
