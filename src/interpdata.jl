@@ -136,3 +136,59 @@ x,y = mesh2vec(xi,yi);
 function mesh2vec(x,y)
     return x[1,:], y[:,1]
 end
+
+"""
+	interp2(x,y,z,xi,yi)
+
+Re-sample 2D data using linear interpolation
+
+**Input**
+* x: vector with x coordinates (uniqe values, i.e. not meshgrid)
+* y: vector with y coordinates (uniqe values, i.e. not meshgrid)
+* z: matrix with (x,y)-dependent values (meshgrid-like)
+* xi: new x coordinates (uniqe values, i.e. not meshgrid)
+* yi: new y coordinates (uniqe values, i.e. not meshgrid)
+
+**Output**
+* zi: interpolated values
+
+**Example**
+```
+zi = interp2(x,y,z,xi,yi)
+
+```
+"""
+function interp2(x::Vector{Float64},y::Vector{Float64},z::Matrix{Float64},
+				 xi::Vector{Float64},yi::Vector{Float64})
+	minx,miny,maxx,maxy,itp = prep2interp(x,y,z);
+	# declare output
+	zi = zeros(Float64,size(xi));
+	for i in 1:length(xi[:])
+		# do not extrapolate!
+		if (xi[i] >= minx && yi[i] >= miny) && (xi[i] <= maxx && yi[i] <= maxy)
+		   zi[i] = itp[yi[i],xi[i]] # use yi,xi order as matlab sorts masgrid in different order
+		else
+		   zi[i] = NaN;
+		end
+	end
+	return zi
+end
+function interp2(x::Vector{Float64},y::Vector{Float64},z::Matrix{Float64},
+				 xi::Matrix{Float64},yi::Matrix{Float64})
+	zi = interp2(x,y,z,xi[:],yi[:]);
+	return reshape(zi,size(xi));
+end
+function interp2(x::Vector{Float64},y::Vector{Float64},z::Matrix{Float64},
+				 xi::Float64,yi::Float64)
+	return interp2(x,y,z,[xi],[yi])[1]
+end
+
+"""
+	Auxilliary function for determination of min and max values of input vectors
+"""
+function prep2interp(x::Vector{Float64},y::Vector{Float64},z::Matrix{Float64})
+    # Need to switch x <--> y as matlab meshgrid uses transposed matrix
+    itp = Interpolations.interpolate((y,x),z,
+            Interpolations.Gridded(Interpolations.Linear()));
+    return minimum(x), minimum(y), maximum(x), maximum(y), itp;
+end

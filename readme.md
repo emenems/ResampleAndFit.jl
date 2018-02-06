@@ -7,10 +7,13 @@ This repository contains functions related to (time) **re-sampling** of DataFram
 * `interpdf`: linearly interpolate values in DataFrame to a new time resolutin (=new DataFrame)
 * `time2regular`: re-sample data in such a way that the output DataFrame contains values with constant (regular) sampling (missing values are filled with NaNs)  
 * `fillnans`: replace NaN values by linearly interpolated values as long as the missing interval is shorter than given (input) maximum gap
+* `interp2`: use [Matlab-like](https://www.mathworks.com/help/matlab/ref/interp2.html) 2D interpolation
 
 _Auxiliary functions_:  
 * `interp1`: linearly interpolate DataArray to a required time (datetime) vector (DataArray)
 * `isregular`: check if the input time vector (data) is regularly sampled
+* `meshgrid`: use Matlab-like [meshgrid](https://www.mathworks.com/help/matlab/ref/meshgrid.html) matrices
+* `mesh2vec`: convert meshgrid matrices to vectors
 
 ## Fitting options:
 * `fitexp`: fit exponential curve with an offset (a + b\*exp(c\*t))
