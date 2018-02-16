@@ -36,7 +36,20 @@ function filtblocks_test()
 	@test sum(filter(!isnan,out)) ≈ 8.+10.*2.
 end
 
+function demean_test()
+	o = [-1.,NaN,0.,1.];
+	s = @data(o+1.234)
+	sf = demean(s)
+	for (i,v) in enumerate(sf)
+		if i != 2
+			@test v ≈ o[i]
+		else
+			@test isnan(v)
+		end
+	end
+end
 # run
 mmconv_test();
 findblocks_test();
 filtblocks_test();
+demean_test();

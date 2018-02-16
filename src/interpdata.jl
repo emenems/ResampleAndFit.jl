@@ -143,19 +143,26 @@ end
 Re-sample 2D data using linear interpolation
 
 **Input**
-* x: vector with x coordinates (uniqe values, i.e. not meshgrid)
-* y: vector with y coordinates (uniqe values, i.e. not meshgrid)
+* x: vector with x coordinates
+* y: vector with y coordinates
 * z: matrix with (x,y)-dependent values (meshgrid-like)
-* xi: new x coordinates (uniqe values, i.e. not meshgrid)
-* yi: new y coordinates (uniqe values, i.e. not meshgrid)
+* xi: new x coordinates
+* yi: new y coordinates
 
 **Output**
 * zi: interpolated values
 
 **Example**
 ```
+# Prepare input
+x = [1.,2.,3.,4.,5.,];
+y = [2.,3.,4.,5.,6.,7.,8.];
+z = ones(Float64,(length(y),length(x)));
+z[2,3] = 2.;
+xi = [4.1,3.0,3.0,3.5,5.0,5.01]
+yi = [2.1,3.0,3.5,3.5,2.0,3.30]
+# compute
 zi = interp2(x,y,z,xi,yi)
-
 ```
 """
 function interp2(x::Vector{Float64},y::Vector{Float64},z::Matrix{Float64},
@@ -177,6 +184,16 @@ function interp2(x::Vector{Float64},y::Vector{Float64},z::Matrix{Float64},
 				 xi::Matrix{Float64},yi::Matrix{Float64})
 	zi = interp2(x,y,z,xi[:],yi[:]);
 	return reshape(zi,size(xi));
+end
+function interp2(x::Matrix{Float64},y::Matrix{Float64},z::Matrix{Float64},
+				 xi::Matrix{Float64},yi::Matrix{Float64})
+	xm,ym = mesh2vec(x,y);
+	return interp2(xm,ym,z,xi,yi);
+end
+function interp2(x::Matrix{Float64},y::Matrix{Float64},z::Matrix{Float64},
+				 xi::Float64,yi::Float64)
+	xm,ym = mesh2vec(x,y);
+	return interp2(xm,ym,z,xi,yi);
 end
 function interp2(x::Vector{Float64},y::Vector{Float64},z::Matrix{Float64},
 				 xi::Float64,yi::Float64)

@@ -78,7 +78,9 @@ function findblocks(invec::Vector{Float64})
 	findblocks_decide(idall,length(invec));
 end
 function findblocks(invec::DataArray)
-	idall = find(isna.(invec));
+	idall1 = find(isna.(invec));
+	idall2 = find(isnan.(invec));
+	idall = unique(vcat(idall1,idall2));
 	findblocks_decide(idall,length(invec));
 end
 function findblocks_decide(idall::Vector{Int},length_invec::Int)
@@ -112,7 +114,7 @@ end
 """
 	filtblocks(sig,imp)
 Filter signal assuming input time series contains NaNs. Thus, piecewise filtering
-of the input singal will be applied (`mmconv` will be utilized).  
+of the input singal will be applied (`mmconv` will be utilized).
 
 See `mmconv` help for **Input** and **Output**
 
@@ -136,4 +138,35 @@ function filtblocks(sig::Vector{Float64},imp::Vector{Float64})
 end
 function filtblocks(sig::DataArray,imp::Vector{Float64})
 	@data(filtblocks(convert(Vector{Float64},sig,NaN),imp));
+end
+
+"""
+	demean(sig::DataArray)
+subtract mean value from input DataArray
+
+**Input:**
+* sig: data to be reduced (can contain NaNs)
+
+**Output**
+* outsig: data after subtraction of mean value
+
+**Example**
+```
+s = @data([-1.,NaN,0.,1.]+1.234)
+sf = demean(s);
+```
+"""
+function demean(sig::DataArray)
+	c = 0;s = 0.;
+	for i in sig
+		if !isnan(i)
+			c += 1;
+			s += i;
+		end
+	end
+	return sig - s/c
+end
+function demean(sig::Vector{Float64})
+	o = demean(convert(DataArray,sig));
+	return convert(Vector{Float64},o,NaN)
 end

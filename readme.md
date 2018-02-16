@@ -29,6 +29,10 @@ _Auxiliary functions_:
 _Auxiliary functions_:  
 * `findblocks`: find time intervals (block) without NaNs (e.g. to allow for piecewise filtering)
 * `mmconv`: convolution + setting edges affected by filter to NaN values
+* `demean`: subtract mean value from input data
+
+## Correct time series:
+`correctinterval`: apply step correction, interpolation or replace time interval specified in input parameters 
 
 ## Usage
 * Check the function help for instructions and example usage
