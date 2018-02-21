@@ -51,6 +51,54 @@ function fillnans(datavec::DataArray{Float64},maxgap::Int)
 end
 
 """
+	replacenans!(datain,replaceby)
+
+Replace all NaNs by given value
+
+**Input:**
+`datain`: DataFrame to be corrected (all Float64 columns)
+`replaceby`: replace NaNs by this value
+
+**Output:**
+corrected DataArray
+
+**Example**
+```
+# NaN will be replaced by 0.0
+datain = DataFrame(Temp=[10.,11.,12.,14.,NaN, 14.,],
+	Grav=[1.,2.,NaN,NaN,NaN,6.],
+	datetime=collect(DateTime(2010,1,1,1):Dates.Hour(1):DateTime(2010,1,1,6)));
+out = replacenans!(datain,0.0);
+```
+"""
+function replacenans!(datain::DataFrame,replaceby::Float64)
+	for i in names(datain)
+		if eltype(datain[i]) == Float64
+			for j in 1:length(datain[i])
+				if isnan(datain[i][j])
+					datain[i][j] = replaceby;
+				end
+			end
+		end
+	end
+end
+
+"""
+Function to convert NA to NaNs (if (el)type=Float64)
+"""
+function na2nan!(datain::DataFrame)
+	for i in names(datain)
+		if eltype(datain[i]) == Float64
+			for j in 1:length(datain[i])
+				if isna(datain[i][j])
+					datain[i][j] = NaN;
+				end
+			end
+		end
+	end
+end
+
+"""
 Auxiliary function for linear interpolation
 """
 function lininterp(datain::DataArray{Float64,1},ind::Int,maxgap::Int)

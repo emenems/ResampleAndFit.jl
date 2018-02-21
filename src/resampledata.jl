@@ -35,6 +35,10 @@ function aggregate2(data::DataFrame;
 	dfc = aggregate(dfc[useonly],:datestringcol,fce)
 	# Add back back datetime and remove date-string used for aggregation
 	dfc[timecol] = DateTime.(dfc[:datestringcol],datestringcol);
+	# make suree that type is DateTime
+	if eltype(dfc[timecol]) != DateTime
+		dfc[timecol] = convert(Vector{DateTime},dfc[timecol]);
+	end
 	delete!(dfc,:datestringcol);
 	return dfc
 end
@@ -56,7 +60,9 @@ s = time2pattern(Dates.Hour(1));
 ```
 """
 function time2pattern(resol)
-	if resol==Dates.Minute(1)
+	if resol==Dates.Second(1)
+		return "yyyymmddHHMMSS"
+	elseif resol==Dates.Minute(1)
 		return "yyyymmddHHMM"
 	elseif resol==Dates.Hour(1)
 		return "yyyymmddHH"
@@ -99,7 +105,6 @@ function time2regular(data::DataFrame;timecol=:datetime,resol=Dates.Hour(1))
 	# Sort accoring to time
 	return sort!(reg_sample, cols=timecol);
 end
-
 
 """
 	isregular(timevec)

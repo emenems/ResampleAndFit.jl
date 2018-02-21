@@ -23,5 +23,29 @@ function fillnans_test()
 	@test sum(out3[[3,4,5,7]]) ≈ 3.+4.+5.+7.
 end
 
+function replacenans_test()
+	data1 = DataFrame(Temp=@data([10.,NaN,30.,40.]),
+					  pres=[1.0,2.0,NaN,4.0],
+		   	datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
+			 DateTime(2010,1,1,2),DateTime(2010,1,1,4)]);
+ 	replacenans!(data1,0.0)
+	@test data1[:Temp] == [10.,0.0,30.,40.]
+	@test data1[:pres] == [1.0,2.0,0.0,4.0]
+end
+
+function na2nan_test()
+	data1 = DataFrame(Temp=@data([10,NA,30,40]),
+					  pres=[1.0,2.0,NaN,4.0],
+		   	datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
+			 DateTime(2010,1,1,2),DateTime(2010,1,1,4)]);
+ 	na2nan!(data1)
+	@test data1[:Temp][[1,3,4]] == [10,30,40]
+	@test isna(data1[:Temp][2])
+	@test data1[:pres][[1,2,4]] == [1.,2.,4.]
+	@test !isna(data1[:pres][3])
+	@test isnan(data1[:pres][3])
+end
 # run
 fillnans_test();
+na2nan_test();
+replacenans_test();

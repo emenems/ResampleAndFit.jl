@@ -9,8 +9,9 @@ In addition, steps in input time series can by corrected.
 Should contain following parameters (keys):
 column = number of a data column or name/key (if number & :datetime in first column: ++column)
 id = type of correction: 1=step, 2=set interval to NaN, 3=set interval to interpolated values
+5=set interval to given values (linspace between y1 and y2) (id=4 not yet implemented).
 x1,x2 = starting,end time of the interval (if id=1 only x1 used)
-y1,y1 = step correction: value at before at after step
+y1,y1 = step correction: value at before at after step (id=1) | values used to replace interval (see id=5)
 
 **Output**
 * corrected DataFrames. Call the function without ! to get a corrected copy of the input dataframe
@@ -44,11 +45,13 @@ function correctinterval!(datain::DataFrame,par::DataFrame)
 	for (i,v) in enumerate(corrpar[:id])
 		if corrpar[:column][i] <= size(datain,2) # haskey(datain,i)
 			if v == 1
-				correctinterval_step(datain,corrpar,i);
+				correctinterval_step!(datain,corrpar,i);
 			elseif v == 2
-				correctinterval_nan(datain,corrpar,i);
+				correctinterval_nan!(datain,corrpar,i);
 			elseif v == 3
-				correctinterval_interp(datain,corrpar,i);
+				correctinterval_interp!(datain,corrpar,i);
+			elseif v == 5
+				correctinterval_replace!(datain,corrpar,i);
 			end
 		end
 	end
@@ -67,20 +70,19 @@ end
 """
 Auxiliary function to correct step in time series
 """
-function correctinterval_step(datain,corrpar,i)
+function correctinterval_step!(datain,corrpar,i)
 	# find points recorded after the step occur.
     r = find(x->x .> corrpar[:x2][i], datain[:datetime]);
 	for j in r # remove the step by SUBTRACTING the given difference.
         datain[corrpar[:column][i]][j] = datain[corrpar[:column][i]][j] .-
 						(corrpar[:y2][i] - corrpar[:y1][i]);
     end
-	return datain
 end
 
 """
 Auxiliary function to set interval to NaNs
 """
-function correctinterval_nan(datain,corrpar,i)
+function correctinterval_nan!(datain,corrpar,i)
 	# find points recorded in-between given time epochs.
     r = find(x->x .> corrpar[:x1][i] && x .< corrpar[:x2][i],datain[:datetime]);
 	for j in r
@@ -91,8 +93,8 @@ end
 """
 Auxiliary function to set interval to linearly interpolated values
 """
-function correctinterval_interp(datain,corrpar,i)
-	# find points recorded after the step occur.
+function correctinterval_interp!(datain,corrpar,i)
+	# find points recorded withing interval.
     r = map(x->x .> corrpar[:x1][i] && x .< corrpar[:x2][i],datain[:datetime]);
     if any(r)
 		# get values except affected interval and use it in interpolation
@@ -100,7 +102,18 @@ function correctinterval_interp(datain,corrpar,i)
 		xtemp = Dates.value.(datain[:datetime][.!r]);
 		datain[corrpar[:column][i]][r] = interp1(xtemp,ytemp,Dates.value.(datain[:datetime][r]));
     end
-	return datain
+end
+
+"""
+Auxiliary function to replace interval using given value
+"""
+function correctinterval_replace!(datain,corrpar,i)
+	# find points recorded in-between given time epochs.
+	r = find(x->x .> corrpar[:x1][i] && x .< corrpar[:x2][i],datain[:datetime]);
+	rep_val = linspace(corrpar[:y1],corrpar[:y2],length(r));
+	for (j,v) in enumerate(r)
+		datain[corrpar[:column][i]][v] = rep_val[j][1];
+	end
 end
 
 """

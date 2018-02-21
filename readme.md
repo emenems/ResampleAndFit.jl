@@ -7,6 +7,8 @@ This repository contains functions related to (time) **re-sampling** of DataFram
 * `interpdf`: linearly interpolate values in DataFrame to a new time resolutin (=new DataFrame)
 * `time2regular`: re-sample data in such a way that the output DataFrame contains values with constant (regular) sampling (missing values are filled with NaNs)  
 * `fillnans`: replace NaN values by linearly interpolated values as long as the missing interval is shorter than given (input) maximum gap
+* `replacenans`: replace all NaNs with given value (for Float64 type only)
+* `na2nan`: convert NAs in DataFrame to NaNs (for Float64 type only)
 * `interp2`: use [Matlab-like](https://www.mathworks.com/help/matlab/ref/interp2.html) 2D interpolation
 
 _Auxiliary functions_:  
@@ -32,7 +34,10 @@ _Auxiliary functions_:
 * `demean`: subtract mean value from input data
 
 ## Correct time series:
-`correctinterval`: apply step correction, interpolation or replace time interval specified in input parameters 
+`correctinterval`: apply step correction, interpolation or replace time interval specified in input parameters
+
+## Merge data:
+`mergetimeseries`: merge DataFrames with DateTime
 
 ## Usage
 * Check the function help for instructions and example usage

@@ -6,7 +6,8 @@ tests = ["filtdata_test.jl",
 		 "interpdata_test.jl",
 		 "fitdata_test.jl",
 		 "fillnans_test.jl",
-		 "correctdata_test.jl"];
+		 "correctdata_test.jl",
+		 "mergedata_test.jl"];
 # Run all tests in the list
 for i in tests
 	include(i)

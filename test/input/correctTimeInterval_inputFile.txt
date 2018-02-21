@@ -1,5 +1,5 @@
 % Correction file for correctTimeInterval function. See function help for further details
-% ID: 1 = removing steps, 2 = remove anomalous time intervals (set to NaN), 3 = interpolate intervals linearly, 4 = interpolate intervals using spline
+% ID: 1 = removing steps, 2 = remove anomalous time intervals (set to NaN), 3 = interpolate intervals linearly, 5 = replace values using given range
 % CN: is the column number
 % y1: value before step (set to NaN if ID~=1)
 % y2: value after step (set to NaN if ID~=1)

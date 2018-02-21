@@ -50,6 +50,13 @@ function corrinterval_test()
 			end
 		end
 	end
+	# Replace values within interval
+	corrpar = DataFrame(column=[2], id = [5],
+						x1 = [DateTime(2010,01,01,03)],
+					  	x2 = [DateTime(2010,01,01,04,30)],
+						y1 = [0.0],y2 = [1.0]);
+	correctinterval!(datain,corrpar);
+	@test datain[:pres][2:3] == [0.0,1.0];
 end
 
 # run
