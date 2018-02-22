@@ -1,4 +1,5 @@
 using ResampleAndFit, Base.Test, DataFrames
+import FileTools
 
 # List of test files. Run the test from ResampleAndFit.jl folder
 tests = ["filtdata_test.jl",

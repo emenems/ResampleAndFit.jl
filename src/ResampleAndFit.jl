@@ -1,6 +1,7 @@
 module ResampleAndFit
 
 using DataFrames
+import FileTools 
 include("fitdata.jl")
 include("resampledata.jl")
 include("interpdata.jl")
@@ -12,9 +13,9 @@ include("mergedata.jl")
 export aggregate2, time2regular, isregular, getresolution
 export interpdf, interp1, meshgrid, mesh2vec, interp2
 export fitexp, evalexp, fitpoly, evalpoly
-export mmconv, findblocks, filtblocks, demean
+export mmconv, findblocks, filtblocks, demean, findnanblocks
 export fillnans, replacenans!, na2nan!
-export correctinterval, correctinterval!
+export correctinterval, correctinterval!, prepcorrpar
 export mergetimeseries
 
 end #module

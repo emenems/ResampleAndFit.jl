@@ -112,6 +112,43 @@ function findblocks_main(idall::Vector{Int},length_invec::Int)
 end
 
 """
+	findnanblocks(invec)
+Find blocks of NaNs
+
+**Input**
+* invec: input vector to be examined. Regular sampling is assumed! (use time2regular)
+
+**Output**
+* start,stop indices of blocks of NaNs
+
+**Example**
+```
+invec = collect(1.:1:17.);
+invec[[6,10,11,12,14,17]] = NaN;
+nstart,nstop = findnanblocks(invec);
+```
+"""
+function findnanblocks(invec)
+	inans = map(isnan,invec);
+	ostart,ostop = Vector{Int64}(), Vector{Int64}();
+	if any(inans)
+		istart,istop = findblocks(invec);
+		ostart = istop[1:end-1] .+ 1;
+		ostop = istart[2:end] .- 1;
+		if istart[1] != 1
+			ostart = vcat(1,ostart);
+			ostop = vcat(istart[1]-1,ostop);
+		end
+		if istop[end] != length(invec)
+			ostart = vcat(ostart,istop[end]+1);
+			ostop = vcat(ostop,length(invec));
+		end
+	end
+	return ostart,ostop
+end
+
+
+"""
 	filtblocks(sig,imp)
 Filter signal assuming input time series contains NaNs. Thus, piecewise filtering
 of the input singal will be applied (`mmconv` will be utilized).

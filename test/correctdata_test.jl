@@ -8,7 +8,7 @@ function corrinterval_test()
     datain[:grav][inan] = NaN;
 	datain[:pres][inan] = NaN;
 	corrfile = joinpath(pwd(),"test/input/correctTimeInterval_inputFile.txt");
-	dataout = correctinterval(datain,corrfile);
+	dataout = correctinterval(datain,corrfile,includetime=false);
 	## Interpolated values
 	# check if only :grav column was corrected
 	for i in inan
@@ -38,7 +38,7 @@ function corrinterval_test()
 							  DateTime(2010,01,01,09,30,09),
 							  DateTime(2010,01,02,04,00,00)],
 						y1 = [NaN,NaN,10.],y2 = [NaN,NaN,0.0]);
-	correctinterval!(datain,corrpar);
+	correctinterval!(datain,corrpar,includetime=false);
 	for k in names(datain)
 		for i in 1:size(datain,1)
 			if typeof(datain[k][i]) != DateTime
@@ -50,14 +50,26 @@ function corrinterval_test()
 			end
 		end
 	end
-	# Replace values within interval
+	# Replace values within interval including x1/x2 time
 	corrpar = DataFrame(column=[2], id = [5],
 						x1 = [DateTime(2010,01,01,03)],
 					  	x2 = [DateTime(2010,01,01,04,30)],
 						y1 = [0.0],y2 = [1.0]);
 	correctinterval!(datain,corrpar);
-	@test datain[:pres][2:3] == [0.0,1.0];
+	@test datain[:pres][1:4] == collect(linspace(0.,1.,4));
 end
 
+function prepcorrpar_test()
+	dfin = DataFrame(Temp = collect(0.:1.:12.),
+		 datetime= collect(DateTime(2000,1,1):Dates.Hour(1):DateTime(2000,1,1,12)))
+	dfin[:Temp][[6,10,11]] = NaN;
+	corrpar = prepcorrpar(dfin[:Temp],dfin[:datetime],min_gap=2,defcol=:Temp,defid=2)
+	@test size(corrpar) == (1,7)
+	@test corrpar[:x1][1] == dfin[:datetime][10]
+	@test corrpar[:x2][1] == dfin[:datetime][11]
+	@test corrpar[:column][1] == :Temp
+	@test corrpar[:id][1] == 2
+end
 # run
 corrinterval_test();
+prepcorrpar_test();

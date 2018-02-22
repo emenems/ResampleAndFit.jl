@@ -12,9 +12,9 @@ end
 function findblocks_test()
 	invec = collect(1.:1:17.);
 	invec[[6,10,11,12,14,17]] = NaN;
-	start,stop = findblocks(invec);
-	@test start == [1,7,13,15];
-	@test stop == [5,9,13,16];
+	start1,stop1 = findblocks(invec);
+	@test start1 == [1,7,13,15];
+	@test stop1 == [5,9,13,16];
 	# Add NaN to the first position
 	invec[1] = NaN;
 	invec = vcat(invec,[18]);
@@ -25,6 +25,24 @@ function findblocks_test()
 	start3,stop3 = findblocks(@data([1.,2.,3.,4.,5.]));
 	@test start3 == [1];
 	@test stop3 == [5]
+end
+
+function findnanblocks_test()
+	invec = collect(1.:1:17.);
+	invec[[6,10,11,12,14,17]] = NaN;
+	start1,stop1 = findnanblocks(invec);
+	@test start1 == [6,10,14,17];
+	@test stop1 == [6,12,14,17];
+	# Add NaN to the first & remove from last position
+	invec[1] = NaN;
+	invec = vcat(invec,[18]);
+	start2,stop2 = findnanblocks(invec);
+	@test start2 == [1,6,10,14,17];
+	@test stop2 == [1,6,12,14,17];
+	# Test DataArray input without NaNs
+	start3,stop3 = findnanblocks(@data([1.,2.,3.,4.,5.]));
+	@test isempty(start3)
+	@test isempty(stop3)
 end
 
 function filtblocks_test()
@@ -53,3 +71,4 @@ mmconv_test();
 findblocks_test();
 filtblocks_test();
 demean_test();
+findnanblocks_test();

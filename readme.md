@@ -30,11 +30,14 @@ _Auxiliary functions_:
 
 _Auxiliary functions_:  
 * `findblocks`: find time intervals (block) without NaNs (e.g. to allow for piecewise filtering)
+`findnanblocks`: return blocks of NaNs in the input vector (opposite to `findblocks`)
 * `mmconv`: convolution + setting edges affected by filter to NaN values
 * `demean`: subtract mean value from input data
 
 ## Correct time series:
-`correctinterval`: apply step correction, interpolation or replace time interval specified in input parameters
+* `correctinterval`: apply step correction, interpolation or replace time interval specified in input parameters
+* `prepcorrpar`: prepare correction parameter needed for `correctinterval` (find blocks of NaNs and format the output)
+* `writecorrpar`: write correction parameter (`prepcorrpar` output) to formatted file as needed for `correctinterval`
 
 ## Merge data:
 `mergetimeseries`: merge DataFrames with DateTime
