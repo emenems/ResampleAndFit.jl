@@ -1,6 +1,6 @@
 ResampleAndFit
 ============
-This repository contains functions related to (time) **re-sampling** of DataFrames, simple curve **fitting**, and **filtering** of time series.
+This repository contains functions related to **re-sampling**, simple curve **fitting**, and **filtering** of time series/DataFrames.  
 
 ## Re-sampling options:
 * `aggregate2`: aggregate data, i.e. compute sum, mean or other function, to a required time sampling. The input DataFrame is re-sampled and new DataFrame with required time resolution is created  
@@ -25,22 +25,22 @@ _Auxiliary functions_:
 > use `LsqFit.curve_fit` for other fitting curves
 
 ## Filter options:
-`filtblocks`: apply `mmconv` for filtering of input signal that contains NaNs (=piecewise filtering)  
-> Assuming input singal is regularly sampled (use `time2regular` function)
+* `filtblocks`: apply `mmconv` for filtering of input signal that may contain NaNs (=piecewise filtering)
+* `demean`: subtract mean value from input data
 
 _Auxiliary functions_:  
-* `findblocks`: find time intervals (block) without NaNs (e.g. to allow for piecewise filtering)
-`findnanblocks`: return blocks of NaNs in the input vector (opposite to `findblocks`)
+* `findblocks`: find time intervals (blocks) without NaNs (e.g. to allow for piecewise filtering)
+* `findnanblocks`: return blocks of NaNs in the input vector (opposite to `findblocks`)
 * `mmconv`: convolution + setting edges affected by filter to NaN values
-* `demean`: subtract mean value from input data
 
 ## Correct time series:
 * `correctinterval`: apply step correction, interpolation or replace time interval specified in input parameters
 * `prepcorrpar`: prepare correction parameter needed for `correctinterval` (find blocks of NaNs and format the output)
-* `writecorrpar`: write correction parameter (`prepcorrpar` output) to formatted file as needed for `correctinterval`
 
 ## Merge data:
-`mergetimeseries`: merge DataFrames with DateTime
+* `mergetimeseries`: merge DataFrames with DateTime
 
 ## Usage
 * Check the function help for instructions and example usage
+
+> Check the REQUIRE file for package dependency

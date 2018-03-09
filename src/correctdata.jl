@@ -44,7 +44,7 @@ function correctinterval!(datain::DataFrame,par::DataFrame;includetime::Bool=tru
 		corrpar[:column] = corrpar[:column] .+ 1;
 	end
 	for (i,v) in enumerate(corrpar[:id])
-		if corrpar[:column][i] <= size(datain,2) # haskey(datain,i)
+		if eltype(corrpar[:column])!=Symbol ? corrpar[:column][i]<=size(datain,2) : haskey(datain,corrpar[:column][i])
 			if v == 1
 				correctinterval_step!(datain,corrpar,i,includetime);
 			elseif v == 2
@@ -86,8 +86,8 @@ Auxiliary function to set interval to NaNs
 """
 function correctinterval_nan!(datain,corrpar,i,includetime)
 	# find points recorded in-between given time epochs.
-    r = includetime ? find(x->x .>= corrpar[:x1][i] && x .<= corrpar[:x2][i],datain[:datetime]) :
-					  find(x->x .> corrpar[:x1][i] && x .< corrpar[:x2][i],datain[:datetime]);
+	r = findinterval(datain[:datetime],corrpar[:x1][i],corrpar[:x2][i],
+						includetime=includetime)
 	for j in r
 		datain[corrpar[:column][i]][j] = NaN
 	end
@@ -113,14 +113,21 @@ Auxiliary function to replace interval using given value
 """
 function correctinterval_replace!(datain,corrpar,i,includetime)
 	# find points recorded in-between given time epochs.
-	r = includetime ? find(x->x .>= corrpar[:x1][i] && x .<= corrpar[:x2][i],datain[:datetime]) :
-					  find(x->x .> corrpar[:x1][i] && x .< corrpar[:x2][i],datain[:datetime]);
+	r = findinterval(datain[:datetime],corrpar[:x1][i],corrpar[:x2][i],
+						includetime=includetime)
 	rep_val = linspace(corrpar[:y1],corrpar[:y2],length(r));
 	for (j,v) in enumerate(r)
 		datain[corrpar[:column][i]][v] = rep_val[j][1];
 	end
 end
 
+"""
+Auxiliary function to find interval between two points
+"""
+function findinterval(timein,x1,x2;includetime::Bool=true)
+	r = includetime ? find(x->x .>= x1 && x .<= x2,timein) :
+					  find(x->x .> x1 && x .< x2,timein);
+end
 
 """
 	prepcorrpar(datain,timein;min_gap,defcol,defid)

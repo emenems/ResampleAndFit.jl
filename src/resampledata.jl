@@ -68,9 +68,9 @@ function time2pattern(resol)
 		return "yyyymmddHH"
 	elseif resol==Dates.Day(1)
 		return "yyyymmdd"
-	elseif resol==Dates.Month(1)
+	elseif resol=="month";#Dates.Month(1)
 		return "yyyymm"
-	elseif resol==Dates.Year(1)
+	elseif resol=="year"#Dates.Year(1)
 		return "yyyy"
 	end
 end
