@@ -210,3 +210,36 @@ function addTimeString(data,resol,timecol)
 	dfc[:datestringcol] = Dates.format.(data[timecol],datestringcol);
 	return dfc,datestringcol
 end
+
+"""
+	cut2interval!(datain,timestart,timeend;)
+Cut input dataframe to set time interval
+
+**Input**
+* datain: input dataframe containing :datetime (DateTime)
+* timestart: starting time (DateTime)
+* timeend: end time (DateTime)
+* keepedges: either keep (true) or remove (false) the time epoch at (timestart,timeend)
+
+> nothing will be deleted if start and end point are outside of input time
+
+**Example**
+```
+datatest = DataFrame(datetime=collect(DateTime(2000,1,1):Dates.Day(1):DateTime(2000,1,12)),
+					 somevalues=collect(1:1:12))
+timestart,timeend = DateTime(2000,1,2),DateTime(2000,1,11);
+cut2interval!(datatest,starttime,endtime,keepedges=(false,true))
+```
+"""
+function cut2interval!(datain::DataFrame,timestart::DateTime,timeend::DateTime;
+						keepedges::Tuple{Bool,Bool}=(true,true))
+	rf = ResampleAndFit.findinterval(datain[:datetime],timestart,timeend,
+									includetime=true);
+	if length(rf) > 0 # at least 1 point must be found to delete rows
+		r1 = keepedges[1] ? collect(1:rf[1]-1) : collect(1:rf[1]);
+		r2 = keepedges[2] ? collect(rf[end]+1:size(datain,1)) : collect(rf[end]:size(datain,1));
+		if length(r1) > 0 || length(r2) > 0
+			deleterows!(datain,vcat(r1,r2));
+		end
+	end
+end

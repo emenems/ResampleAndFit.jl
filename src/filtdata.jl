@@ -207,3 +207,37 @@ function demean(sig::Vector{Float64})
 	o = demean(convert(DataArray,sig));
 	return convert(Vector{Float64},o,NaN)
 end
+
+
+"""
+	detrend(x,y;deg)
+subtract polynomial from input DataArray
+
+**Input:**
+* x: x coordinates
+* y: y coordinates
+* deg: polynomial degree to be subtracted (0=mean,1=linear,etc)
+
+**Output**
+* outsig: data after subtraction of given polynomial
+
+**Example**
+```
+x = @data(collect(1.:1:10));
+y = @data(ones(length(x)));
+out = detrend(x,y,deg=1)
+```
+"""
+function detrend(x,y;deg::Int=1)
+	if deg==0
+		return demean(y)
+	else
+		xc,yc = copy(x),copy(y);
+		# remove NaNs
+		xc = xc[.!isnan.(y)];
+		yc = yc[.!isnan.(y)];
+		# fit
+		fit,err = ResampleAndFit.fitpoly(xc,yc,deg=deg);
+		return y - ResampleAndFit.evalpoly(x,fit);
+	end
+end

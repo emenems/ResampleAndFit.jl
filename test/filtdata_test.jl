@@ -66,9 +66,21 @@ function demean_test()
 		end
 	end
 end
+
+function detrend_test()
+	x = @data(collect(1.:1:10));
+	y = @data(ones(length(x)));
+	yc0 = detrend(x,y,deg=0);
+	@test isapprox(sum(yc0),0.0)
+
+	yc1 = detrend(x,x.*0.5,deg=1);
+	@test isapprox(sum(yc1),0.0,atol=1e-10)
+end
+
 # run
 mmconv_test();
 findblocks_test();
 filtblocks_test();
 demean_test();
 findnanblocks_test();
+detrend_test();

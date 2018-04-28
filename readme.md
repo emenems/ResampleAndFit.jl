@@ -16,6 +16,7 @@ _Auxiliary functions_:
 * `isregular`: check if the input time vector (data) is regularly sampled
 * `meshgrid`: use Matlab-like [meshgrid](https://www.mathworks.com/help/matlab/ref/meshgrid.html) matrices
 * `mesh2vec`: convert meshgrid matrices to vectors
+* `cut2interval!`: cut the input dataframe to required time interval 
 
 ## Fitting options:
 * `fitexp`: fit exponential curve with an offset (a + b\*exp(c\*t))
@@ -27,6 +28,7 @@ _Auxiliary functions_:
 ## Filter options:
 * `filtblocks`: apply `mmconv` for filtering of input signal that may contain NaNs (=piecewise filtering)
 * `demean`: subtract mean value from input data
+* `detrend`: subtract polynomial fit from input data
 
 _Auxiliary functions_:  
 * `findblocks`: find time intervals (blocks) without NaNs (e.g. to allow for piecewise filtering)

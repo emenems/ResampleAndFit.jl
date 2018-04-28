@@ -44,6 +44,33 @@ function isregular_test()
 	@test isregular(timevec) == true
 end
 
+function cut2interval_test()
+	datain = DataFrame(datetime=collect(DateTime(2000,1,1):Dates.Day(1):DateTime(2000,1,12)),
+						 somevalues=collect(1:1:12))
+	datatest = deepcopy(datain);
+	# do not cut anything as the interval is outside given time vector
+	starttime,endtime = DateTime(2000,2,2),DateTime(2000,2,11);
+	cut2interval!(datatest,starttime,endtime,keepedges=(false,true))
+	@test datatest == datain
+	# cut, but keep starting point
+	starttime,endtime = DateTime(2000,1,1),DateTime(2000,1,11);
+	datatest = deepcopy(datain);
+	cut2interval!(datatest,starttime,endtime,keepedges=(true,false))
+	@test datatest[:datetime] == datain[:datetime][1:10]
+	# cut, removing starting point and keeping end
+	starttime,endtime = DateTime(2000,1,1),DateTime(2000,1,9);
+	datatest = deepcopy(datain);
+	cut2interval!(datatest,starttime,endtime,keepedges=(false,true))
+	@test datatest[:datetime] == datain[:datetime][2:9]
+	# Do not cut anything because of the specific setting (end time outside time
+	# interval & keep first point)
+	starttime,endtime = DateTime(2000,1,1),DateTime(2001,12,9);
+	datatest = deepcopy(datain);
+	cut2interval!(datatest,starttime,endtime,keepedges=(true,true))
+	@test datatest == datain
+end
+
 aggeregate2_test();
 time2regular_test();
 isregular_test();
+cut2interval_test()
