@@ -40,5 +40,5 @@ function mergetimeseries(args...;timecol=:datetime,kind=:outer)
 	dataout[timecol] = DateTime.(dataout[:datestringcol],datestringcol)
 	delete!(dataout,:datestringcol)
 	na2nan!(dataout); # replace NAs
-	return DataFrames.sort!(dataout, cols = [order(:datetime)])
+	return DataFrames.sort!(dataout, [order(:datetime)])
 end

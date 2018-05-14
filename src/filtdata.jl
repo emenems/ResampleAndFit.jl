@@ -78,7 +78,7 @@ function findblocks(invec::Vector{Float64})
 	findblocks_decide(idall,length(invec));
 end
 function findblocks(invec::DataArray)
-	idall1 = find(isna.(invec));
+	idall1 = find(ismissing.(invec));
 	idall2 = find(isnan.(invec));
 	idall = unique(vcat(idall1,idall2));
 	findblocks_decide(idall,length(invec));

@@ -8,9 +8,9 @@ function aggeregate2_test()
 					  ]);
 	dfa = aggregate2(dfi,resol=Dates.Day(1),fce=minimum);
 	@test dfa[1,1] == 10
-	@test isna(dfa[2,1])
+	@test ismissing(dfa[2,1])
 	# aggregate2: compute sum removing NAs
-	dfa = aggregate2(dfi,resol=Dates.Day(1),fce=x->sum(dropna(x)))
+	dfa = aggregate2(dfi,resol=Dates.Day(1),fce=x->sum(collect(skipmissing(x))))
 	@test dfa[1,1] == 10+11+14
 	@test dfa[2,1] == 1+2+4
 end
@@ -25,7 +25,7 @@ function time2regular_test()
 					  ]);
 	reg_sample = time2regular(dfi,timecol=:datetime,resol=Dates.Hour(6))
 	@test size(reg_sample,1) == 8
-	@test isna(reg_sample[3,1])
+	@test ismissing(reg_sample[3,1])
 end
 
 # isregular

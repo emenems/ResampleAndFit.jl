@@ -5,7 +5,7 @@ Find and (try to) remove all NaNs in the input data vector (`datavec`) via
 linear interpolation
 
 **Input:**
-`datavec`: vector (DataArray) to be corrected for NaNs. It is assumed that this
+`datavec`: vector to be corrected for NaNs. It is assumed that this
 	vector corresponds to equally sampled time vector! Use the `time2regular`
 	function to ensure regular sampling, or check the sampling using `isregular`
 	function.
@@ -14,7 +14,7 @@ linear interpolation
 
 
 **Output:**
-corrected DataArray
+corrected vector
 
 
 **Example**
@@ -33,8 +33,8 @@ corrindex = find(isnan.(data[:Temp]) .& !isnan.(out)); # will return [5]
 data[:Grav] = fillnans(data[:Grav],2);
 ```
 """
-function fillnans(datavec::DataArray{Float64},maxgap::Int)
-   const nanlines = !isnan.(datavec);
+function fillnans(datavec::Vector{Float64},maxgap::Int)
+   const nanlines = .!isnan.(datavec);
    dataout = copy(datavec);
    for i in 2:length(datavec)-1
 	   if nanlines[i]==false # only for NaNs
@@ -60,7 +60,7 @@ Replace all NaNs by given value
 `replaceby`: replace NaNs by this value
 
 **Output:**
-corrected DataArray
+corrected vector
 
 **Example**
 ```
@@ -88,12 +88,8 @@ Function to convert NA to NaNs (if (el)type=Float64)
 """
 function na2nan!(datain::DataFrame)
 	for i in names(datain)
-		if eltype(datain[i]) == Float64
-			for j in 1:length(datain[i])
-				if isna(datain[i][j])
-					datain[i][j] = NaN;
-				end
-			end
+		if eltype(datain[i]) == Union{Float64, Missings.Missing}
+			datain[i] = collect(Missings.replace(datain[i],NaN))
 		end
 	end
 end
@@ -101,7 +97,7 @@ end
 """
 Auxiliary function for linear interpolation
 """
-function lininterp(datain::DataArray{Float64,1},ind::Int,maxgap::Int)
+function lininterp(datain::Vector{Float64},ind::Int,maxgap::Int)
 	xl,xr,yl,yr = prepwindow(datain,ind);
 	if xr - xl <= maxgap+1 # make sure the window is not too long
 		return (yr-yl)/(xr-xl)*(ind-xl) + yl; # (slope)*distance + offset
@@ -113,11 +109,11 @@ end
 Auxiliary function to prepare data for interpolation (remove NaNs and convert
 	input to x,y coordinates)
 """
-function prepwindow(datain::DataArray{Float64,1},ind::Int)
+function prepwindow(datain::Vector{Float64},ind::Int)
 	li = datain[1:ind]; # values left of NaN
 	ri = datain[ind:end]; # values right of NaN
-	rl = !isnan.(li); # find all valid values on left
-	rr = !isnan.(ri); # ------------------------ right
+	rl = .!isnan.(li); # find all valid values on left
+	rr = .!isnan.(ri); # ------------------------ right
 	xl = 1:ind |> x -> x[rl][end]; # get only left x coodinate closest to NaN
 	xr = ind:length(datain) |> x -> x[rr][1];#right--------------------
 	yl = li[rl][end]; # y coordinate on left

@@ -6,7 +6,7 @@ Re-sample dataframe applying linear interpolation to all columns
 
 **Input**
 * data: DataFrame where at least one column contains DateTime
-* timevec: output time vector (=DataArray{DateTime,1})
+* timevec: output time vector (=Vector{DateTime,1})
 * timecol: column containing DateTime (default value = :datetime)
 
 **Output**
@@ -21,7 +21,7 @@ datai = interpdf(data,[DateTime(2010,1,1,12,0,0)]);
 
 ```
 """
-function interpdf(data::DataFrame,timevec::DataArray{DateTime,1};timecol=:datetime)
+function interpdf(data::DataFrame,timevec::Vector{DateTime};timecol=:datetime)
 	# prepare input time vector for interpolation
 	x,xi,dfi = preptime(data[timecol],timevec);
 	# run for all input columns except for DateTime (x vector) and Types not
@@ -76,7 +76,7 @@ Auxiliary function to prepare time in DateTime format for interpolation
 Will convert DateTime to Number/Int and declare/create output (length) dataframe
 
 """
-function preptime(dft::DataArray{DateTime,1},timevec::DataArray{DateTime,1})
+function preptime(dft::Vector{DateTime},timevec::Vector{DateTime})
 	x = Dates.value.(dft);
 	xi = Dates.value.(timevec);
 	dfi = DataFrame(datetime=timevec);

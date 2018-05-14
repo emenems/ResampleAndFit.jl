@@ -23,7 +23,7 @@ Missing (NaN) data can be either kept or replaced during re-sampling.
 data = DataFrame(Temp=[10,11,12,14],
        datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
          DateTime(2010,1,1,2),DateTime(2010,1,1,4)]);
-dataa = aggregate2(data,resol=Dates.Day(1),fce=x->minimum(dropna(x)));
+dataa = aggregate2(data,resol=Dates.Day(1),fce=x->minimum(collect(skipmissing(x))));
 ```
 """
 function aggregate2(data::DataFrame;
@@ -103,7 +103,7 @@ function time2regular(data::DataFrame;timecol=:datetime,resol=Dates.Hour(1))
 	# joint original and regular sampled dataframe
 	reg_sample = join(data,dfr,on=timecol,kind=:right);
 	# Sort accoring to time
-	return sort!(reg_sample, cols=timecol);
+	return sort!(reg_sample, timecol);
 end
 
 """
@@ -135,7 +135,9 @@ function isregular(timevec::DataArray{DateTime,1})
 		return false;
 	end
 end
-
+function isregular(timevec::Vector{DateTime})
+	isregular(convert(DataArray{DateTime},timevec))
+end
 
 """
 	getresolution(timevec;timecol)

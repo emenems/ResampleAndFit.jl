@@ -156,7 +156,7 @@ corrpar = prepcorrpar(dfin[:Temp],dfin[:datetime],min_gap=min_gap,
 					defcol=:Temp,defid=2);
 ```
 """
-function prepcorrpar(datain::DataArray,timein::DataArray{DateTime};
+function prepcorrpar(datain,timein::Vector{DateTime};
 						min_gap::Int=1,defcol=1,defid::Int=1)
 	corrpar = DataFrame();
 	nstart,nstop = ResampleAndFit.findnanblocks(datain);
