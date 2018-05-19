@@ -10,8 +10,8 @@ Should contain following parameters (keys):
 column = number of a data column or name/key (if number & :datetime in first column: ++column)
 id = type of correction: 1=step, 2=set interval to NaN, 3=set interval to interpolated values
 5=set interval to given values (linspace between y1 and y2) (id=4 not yet implemented).
-x1,x2 = starting,end time of the interval (if id=1 only x1 used)
-y1,y1 = step correction: value at before at after step (id=1) | values used to replace interval (see id=5)
+x1,x2 = starting,end time of the interval
+y1,y2 = step correction: value at before at after step (id=1) | values used to replace interval (see id=5). If id=0 and y1==0.0 && isnan(y2), than difference is set to zero
 * includetime: switch to either to apply correction to time including x1/x2 or just > & < (true: => & <=)
 
 **Output**
@@ -75,9 +75,19 @@ function correctinterval_step!(datain,corrpar,i,includetime)
 	# find points recorded after the step occur.
 	r = includetime ? find(x->x .>= corrpar[:x2][i], datain[:datetime]) :
 					  find(x->x .> corrpar[:x2][i], datain[:datetime]);
+	# check if both values are given (if second not, then set diff. to 0)
+	if !isnan(corrpar[:y1][i]) && isnan(corrpar[:y2][i])
+		r1 = includetime ? find(x->x .>= corrpar[:x1][i], datain[:datetime]) :
+						  find(x->x .> corrpar[:x1][i], datain[:datetime]);
+		applyDiff = datain[corrpar[:column][i]][r[1]] -
+						datain[corrpar[:column][i]][r1[1]] -
+							corrpar[:y1][i];
+	else
+		applyDiff = corrpar[:y2][i] - corrpar[:y1][i];
+	end
 	for j in r # remove the step by SUBTRACTING the given difference.
-        datain[corrpar[:column][i]][j] = datain[corrpar[:column][i]][j] .-
-						(corrpar[:y2][i] - corrpar[:y1][i]);
+        datain[corrpar[:column][i]][j] = datain[corrpar[:column][i]][j] -
+						applyDiff;
     end
 end
 

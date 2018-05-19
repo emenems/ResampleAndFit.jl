@@ -59,6 +59,23 @@ function corrinterval_test()
 	@test datain[:pres][1:4] == collect(linspace(0.,1.,4));
 end
 
+function correctdata_test2()
+	datain = DataFrame(
+			   datetime=collect(DateTime(2010,1,1,3):Dates.Minute(60):DateTime(2010,1,2,12)),
+			   grav = zeros(Float64,34)+9.8,
+			   pres = zeros(Float64,34)+1000.,
+			   temp = zeros(Float64,34)+27.);
+    datain[:temp][5:end] += 3;
+	datain[:temp][33:end] += 1;
+	corrfile = joinpath(pwd(),"test/input/correctTimeInterval_inputFile2.txt");
+	dataout = correctinterval(datain,corrfile,includetime=true);
+	@test sum(dataout[:temp]) == 27.0*length(dataout[:temp])+2.
+	# all others are unchanged
+	for i in [:grav,:pres,:datetime]
+		@test dataout[i] == datain[i]
+	end
+end
+
 function prepcorrpar_test()
 	dfin = DataFrame(Temp = collect(0.:1.:12.),
 		 datetime= collect(DateTime(2000,1,1):Dates.Hour(1):DateTime(2000,1,1,12)))
@@ -72,4 +89,5 @@ function prepcorrpar_test()
 end
 # run
 corrinterval_test();
+correctdata_test2();
 prepcorrpar_test();

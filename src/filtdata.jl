@@ -46,7 +46,8 @@ outsig = correctconv(sig,length(imp));
 ```
 """
 function correctconv(sig::Vector{Float64},impl::Int)
-	temp = round(Int,(impl-1)/2);
+	iseven(impl) ? error("Filter must have odd number of coefficients") : nothing
+	temp = div(impl,2);
 	# Remove phase shift
 	out = sig[1+temp:end-temp];
 	# Remove filter/edge effect
