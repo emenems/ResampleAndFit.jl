@@ -1,4 +1,4 @@
-using ResampleAndFit, Base.Test, DataFrames, DataArrays
+using ResampleAndFit, Base.Test, DataFrames
 import FileTools
 
 # List of test files. Run the test from ResampleAndFit.jl folder

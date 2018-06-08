@@ -23,9 +23,6 @@ function mmconv(sig::Vector{Float64},imp::Vector{Float64})
 	outsig = conv(sig,imp);
 	return correctconv(outsig,length(imp));
 end
-function mmconv(sig::DataArray,imp::Vector{Float64})
-	@data(mmconv(convert(Vector{Float64},sig,NaN),imp));
-end
 
 """
 	correctconv(sig,impl)
@@ -78,12 +75,7 @@ function findblocks(invec::Vector{Float64})
 	idall = find(isnan.(invec));
 	findblocks_decide(idall,length(invec));
 end
-function findblocks(invec::DataArray)
-	idall1 = find(ismissing.(invec));
-	idall2 = find(isnan.(invec));
-	idall = unique(vcat(idall1,idall2));
-	findblocks_decide(idall,length(invec));
-end
+
 function findblocks_decide(idall::Vector{Int},length_invec::Int)
 	if !isempty(idall)
 		return findblocks_main(idall,length_invec);
@@ -174,13 +166,10 @@ function filtblocks(sig::Vector{Float64},imp::Vector{Float64})
 	end
 	return out
 end
-function filtblocks(sig::DataArray,imp::Vector{Float64})
-	@data(filtblocks(convert(Vector{Float64},sig,NaN),imp));
-end
 
 """
-	demean(sig::DataArray)
-subtract mean value from input DataArray
+	demean(sig)
+subtract mean value from input Vector
 
 **Input:**
 * sig: data to be reduced (can contain NaNs)
@@ -190,11 +179,11 @@ subtract mean value from input DataArray
 
 **Example**
 ```
-s = @data([-1.,NaN,0.,1.]+1.234)
+s = [-1.,NaN,0.,1.]+1.234
 sf = demean(s);
 ```
 """
-function demean(sig::DataArray)
+function demean(sig::Vector{Float64})::Vector{Float64}
 	c = 0;s = 0.;
 	for i in sig
 		if !isnan(i)
@@ -204,15 +193,10 @@ function demean(sig::DataArray)
 	end
 	return sig - s/c
 end
-function demean(sig::Vector{Float64})
-	o = demean(convert(DataArray,sig));
-	return convert(Vector{Float64},o,NaN)
-end
-
 
 """
 	detrend(x,y;deg)
-subtract polynomial from input DataArray
+subtract polynomial from input Vector
 
 **Input:**
 * x: x coordinates
@@ -224,8 +208,8 @@ subtract polynomial from input DataArray
 
 **Example**
 ```
-x = @data(collect(1.:1:10));
-y = @data(ones(length(x)));
+x = collect(1.:1:10);
+y = ones(length(x));
 out = detrend(x,y,deg=1)
 ```
 """

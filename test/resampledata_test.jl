@@ -1,6 +1,6 @@
 # aggregate2: find minimum including NAs
 function aggeregate2_test()
-	dfi = DataFrame(Temp=@data([10,11,14,1,2,NA,4]),
+	dfi = DataFrame(Temp=[10,11,14,1,2,missing,4],
 	   		datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,6),
 	         		  DateTime(2010,1,1,18),
 	           		  DateTime(2010,1,2,0),DateTime(2010,1,2,6),
@@ -17,7 +17,7 @@ end
 
 # time2regular
 function time2regular_test()
-	dfi = DataFrame(Temp=@data([10,11,14,1,2,NA,4]),
+	dfi = DataFrame(Temp=[10,11,14,1,2,missing,4],
 	   		datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,6),
 	         		  DateTime(2010,1,1,18),
 	           		  DateTime(2010,1,2,0),DateTime(2010,1,2,6),
@@ -31,7 +31,7 @@ end
 # isregular
 function isregular_test()
 	# Test irregular
-	dfi = DataFrame(Temp=@data([10,11,14,1,2,NA,4]),
+	dfi = DataFrame(Temp=[10,11,14,1,2,missing,4],
 	   		datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,6),
 	         		  DateTime(2010,1,1,18),
 	           		  DateTime(2010,1,2,0),DateTime(2010,1,2,6),
@@ -40,7 +40,7 @@ function isregular_test()
 	@test isregular(dfi[:datetime]) == false
 
 	# Test regular
-	timevec = @data(collect(DateTime(2000,1,1):Dates.Hour(1):DateTime(2001,1,2,3,0,0)));
+	timevec = collect(DateTime(2000,1,1):Dates.Hour(1):DateTime(2001,1,2,3,0,0));
 	@test isregular(timevec) == true
 end
 

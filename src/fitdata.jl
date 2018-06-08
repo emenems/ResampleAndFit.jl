@@ -6,20 +6,20 @@ Fit exponential curve with offset assuming following function:
 y = p[1] + p[2]\*exp.(p[3].\*x)
 
 **Input: Vectors**
-* x: x coordinate DataArray (Float64 or DateTime)
-* y: y coordinate DataArray (Float64)
+* x: x coordinate vector (Float64 or DateTime)
+* y: y coordinate vector (Float64)
 
 **Output**
 * (fitted parameters p[1-3], 95% confidence error bars)
 
 **Example**
 ```
-x = @data(collect(1.:1:10*365)./365);
+x = collect(1.:1:10*365)./365;
 y = 1869.9 - 782.*exp.(-0.085.*x) + rand(length(x))*20;
 par,er = fitexp(x,y);
 ```
 """
-function fitexp(x::DataArray{Float64,1},y::DataArray{Float64,1})
+function fitexp(x::Vector{Float64},y::Vector{Float64})
 	x,y = fitprep(x,y);
 	function fitexp_guess()
 		# First guess based on: https://math.stackexchange.com/questions/1337601/fit-exponential-with-constant
@@ -45,7 +45,7 @@ function fitexp(x::DataArray{Float64,1},y::DataArray{Float64,1})
 	# Return estimated parameters
 	return fitmodel(evalexp,x,y,[a,b,c])
 end
-function fitexp(x::DataArray{DateTime,1},y::DataArray{Float64,1})
+function fitexp(x::Vector{DateTime},y::Vector{Float64})
 	x = convert.(Float64,Dates.value.(x));
 	return fitexp(x,y);
 end
@@ -55,7 +55,7 @@ end
 Evaluate/compute exponential function using given parameters and x coordinate
 
 **Input**
-* x: x coordinate DataArray{DateTime or Float64} or Vector{Float64}
+* x: x coordinate Vector{DateTime or Float64} or Vector{Float64}
 * par: vector with 3 parameters: par[1] + par[2]\*exp.(x.\*par[3])
 * par: vector with 2 parameters: par[1]\*exp.(x.\*par[2])
 
@@ -64,7 +64,7 @@ Evaluate/compute exponential function using given parameters and x coordinate
 
 **Example**
 ```
-x = @data(collect(1.:1:10*365)./365);
+x = collect(1.:1:10*365)./365;
 y = evalexp(x,[1869.9,-782.,-0.085]);
 ```
 """
@@ -75,10 +75,7 @@ function evalexp(x::Vector{Float64},par::Vector{Float64})
 		return par[1].*exp.(x.*par[2])
 	end
 end
-function evalexp(x::DataArray{Float64},par::Vector{Float64})
-	return evalexp(convert(Vector{Float64},x),par);
-end
-function evalexp(x::DataArray{DateTime},par::Vector{Float64})
+function evalexp(x::Vector{DateTime},par::Vector{Float64})
 	x = convert.(Float64,Dates.value.(x));
 	return evalexp(x,par);
 end
@@ -88,23 +85,22 @@ end
 Prepare data for fitting, i.e. remove NaNs,...
 
 **Input**
-* x,y: x and y DataArray
+* x,y: x and y Vector
 
 **Output**
 * tuple with corrected vectors (Float64)
 
 **Example**
 ```
-x = @data([1.,2,3,4]);
-y = @data([10.,NaN,30,40]);
+x = [1.,2,3,4];
+y = [10.,NaN,30,40];
 x0,y0 = fitprep(x,y);
 ```
 
 """
-function fitprep(x::DataArray{Float64,1},y::DataArray{Float64,1})
-	x0 = convert(Vector{Float64},x,NaN);
-	y0 = convert(Vector{Float64},y,NaN);
-	r = find(isnan,x0+y0);
+function fitprep(x::Vector{Float64},y::Vector{Float64})
+	x0,y0 = copy(x),copy(y);
+	r = find(isnan,x+y);
 	deleteat!(x0,r);
 	deleteat!(y0,r);
 	return x0,y0;
@@ -116,8 +112,8 @@ end
 Polynomial fitting based on LsqFit while removing NA values prior fitting
 
 **Input**
-* x: x coordinate DataArray (Float64 or DateTime)
-* y: y coordinate DataArray (Float64)
+* x: x coordinate Vector (Float64 or DateTime)
+* y: y coordinate Vector (Float64)
 * deg: degree of the polynomial between 0 and 4 (default=0 ==> constant)
 
 **Output**
@@ -125,12 +121,12 @@ Polynomial fitting based on LsqFit while removing NA values prior fitting
 
 **Example**
 ```
-x = @data(collect(1.:1:365));
+x = collect(1.:1:365);
 y = 10. + 0.1*x + rand(length(x))/2;
 par,er = fitpoly(x,y,deg=1);
 ```
 """
-function fitpoly(x::DataArray{Float64,1},y::DataArray{Float64,1};deg::Int64=0)
+function fitpoly(x::Vector{Float64},y::Vector{Float64};deg::Int64=0)
 	# First guess
 	function fitpoly_guess()
 		if deg == 0
@@ -158,7 +154,7 @@ function fitpoly(x::DataArray{Float64,1},y::DataArray{Float64,1};deg::Int64=0)
 		return NaN, NaN
 	end
 end
-function fitpoly(x::DataArray{DateTime,1},y::DataArray{Float64,1};deg::Int64=0)
+function fitpoly(x::Vector{DateTime},y::Vector{Float64};deg::Int64=0)
 	x = convert.(Float64,Dates.value.(x));
 	return fitpoly(x,y,deg=deg);
 end
@@ -170,7 +166,7 @@ parameters
 
 **Input**
 model: function to be fitted
-x: x coordinates vector (not DataArray)
+x: x coordinates vector (not Vector)
 y: y values (vector). NA values on input will not be corrected!
 approx_val: approximated values of the model parameters
 
@@ -217,7 +213,7 @@ end
 Evaluate/compute polynomial function using given parameters and x coordinate
 
 **Input**
-* x: x coordinate DataArray{DateTime or Float64} or Vector{Float64}
+* x: x coordinate Vector{DateTime or Float64} or Vector{Float64}
 * par: vector with n parameters (polynomial degree = n-1)
 
 **Output**
@@ -225,19 +221,15 @@ Evaluate/compute polynomial function using given parameters and x coordinate
 
 **Example**
 ```
-x = @data(collect(1.:1:10*365));
+x = collect(1.:1:10*365);
 y = evalpoly(x,[0.01, 10.]);
 ```
 """
-function evalpoly(x::Vector{Float64},par::Vector{Float64})
+function evalpoly(x::Vector{Float64},par::Vector{Float64})::Vector{Float64}
 	mod = getpolymodel(length(par)-1);
 	return mod(x,par);
 end
-function evalpoly(x::DataArray{Float64,1},par::Vector{Float64})
-	y = evalpoly(convert(Vector{Float64},x),par);
-	return DataArray(y)
-end
-function evalpoly(x::DataArray{DateTime,1},par::Vector{Float64})
+function evalpoly(x::Vector{DateTime},par::Vector{Float64})::Vector{Float64}
 	x = convert.(Float64,Dates.value.(x));
 	return evalpoly(x,par);
 end

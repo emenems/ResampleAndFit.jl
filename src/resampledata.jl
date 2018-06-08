@@ -112,31 +112,28 @@ end
 Check if the data/time vector is regularly sampled
 
 **Input**
-`timevec`: DataArray with DateTime
+`timevec`: Vector with DateTime
 
 **Output**
 `true` for regularly sampled data
 
 **Example**
 ```
-timevec = @data([DateTime(2010,1,1,1,0,0),
+timevec = [DateTime(2010,1,1,1,0,0),
 				 DateTime(2010,1,1,2,0,0),
 				 DateTime(2010,1,1,3,0,0),
 				 DateTime(2010,1,1,5,0,0),# fourth hour is missing =>not regular
-				 DateTime(2010,1,1,6,0,0)]);
+				 DateTime(2010,1,1,6,0,0)];
 out = isregular(timevec); # will return false
 ```
 """
-function isregular(timevec::DataArray{DateTime,1})
+function isregular(timevec::Vector{DateTime})
 	timediff = diff(Dates.value.(timevec));
 	if all(timediff[1] .== timediff)
 		return true;
 	else
 		return false;
 	end
-end
-function isregular(timevec::Vector{DateTime})
-	isregular(convert(DataArray{DateTime},timevec))
 end
 
 """
@@ -145,7 +142,7 @@ Get time resolution in `Dates` format
 NOT tested yet.
 
 **Input:**
-`timevec`: vector/DataArray with DateTime values
+`timevec`: vector with DateTime values
 
 **Output:**
 time resolution in `Dates` format. Will return one of following:
@@ -154,13 +151,13 @@ Dates.Day(X),  where X <0,10>
 
 **Example:**
 ```
-timevec = @data([DateTime(2010,1,1,1,0,0),
+timevec = [DateTime(2010,1,1,1,0,0),
 				 DateTime(2010,1,1,2,0,0),
-				 DateTime(2010,1,1,3,0,0)]);
+				 DateTime(2010,1,1,3,0,0)];
 resol = getresolution(timevec); # should return Dates.Hour(1);
 ```
 """
-function getresolution(timevec::DataArray{DateTime})
+function getresolution(timevec::Vector{DateTime})
 	dt = timevec[2]-timevec[1];
 	if dt < Dates.Millisecond(1000) # millisecond
 		return dt;

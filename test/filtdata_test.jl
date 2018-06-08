@@ -21,8 +21,8 @@ function findblocks_test()
 	start2,stop2 = findblocks(invec);
 	@test start2 == [2,7,13,15,18];
 	@test stop2 == [5,9,13,16,18];
-	# Test DataArray input without NaNs
-	start3,stop3 = findblocks(@data([1.,2.,3.,4.,5.]));
+	# Test Vector input without NaNs
+	start3,stop3 = findblocks([1.,2.,3.,4.,5.]);
 	@test start3 == [1];
 	@test stop3 == [5]
 end
@@ -39,8 +39,8 @@ function findnanblocks_test()
 	start2,stop2 = findnanblocks(invec);
 	@test start2 == [1,6,10,14,17];
 	@test stop2 == [1,6,12,14,17];
-	# Test DataArray input without NaNs
-	start3,stop3 = findnanblocks(@data([1.,2.,3.,4.,5.]));
+	# Test Vector input without NaNs
+	start3,stop3 = findnanblocks([1.,2.,3.,4.,5.]);
 	@test isempty(start3)
 	@test isempty(stop3)
 end
@@ -56,7 +56,7 @@ end
 
 function demean_test()
 	o = [-1.,NaN,0.,1.];
-	s = @data(o+1.234)
+	s = o+1.234
 	sf = demean(s)
 	for (i,v) in enumerate(sf)
 		if i != 2
@@ -68,8 +68,8 @@ function demean_test()
 end
 
 function detrend_test()
-	x = @data(collect(1.:1:10));
-	y = @data(ones(length(x)));
+	x = collect(1.:1:10);
+	y = ones(length(x));
 	yc0 = detrend(x,y,deg=0);
 	@test isapprox(sum(yc0),0.0)
 

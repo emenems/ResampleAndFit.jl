@@ -53,7 +53,7 @@ yi = interp1([1,2,3,4],[10,20,30,40],1.5);
 """
 function interp1(x,y,xi)
 	# Declare output vector
-	out = @data(zeros(length(xi)));
+	out = zeros(length(xi));
 	# Create interpolation object
     itp = Interpolations.interpolate((x,),y,
             Interpolations.Gridded(Interpolations.Linear()));

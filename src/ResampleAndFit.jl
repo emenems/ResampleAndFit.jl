@@ -1,6 +1,6 @@
 module ResampleAndFit
 
-using DataFrames, DataArrays
+using DataFrames
 import FileTools
 include("fitdata.jl")
 include("resampledata.jl")

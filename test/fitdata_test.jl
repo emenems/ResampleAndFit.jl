@@ -1,6 +1,6 @@
 # fitexp
 function fitexp_test()
-	x = @data(collect(1.:1:10*365)./365);
+	x = collect(1.:1:10*365)./365;
 	y = 1869.9 - 782.*exp.(-0.085.*x);
 	par,er = fitexp(x,y);
 	@test round(sum(par*10)) ≈ round(18699-7820-0.85)
@@ -9,12 +9,12 @@ end
 
 # evalexp
 function evalexp_test()
-	@test evalexp(@data([3.]),[10.,0.5,0.05]) ≈ @data([10. + 0.5*exp(0.05*3.)])
+	@test evalexp([3.],[10.,0.5,0.05]) ≈ [10. + 0.5*exp(0.05*3.)]
 end
 
 # fitpoly
 function fitpoly_test()
-	x = @data(collect(1.:1:365));
+	x = collect(1.:1:365);
 	y = 10. + 0.1*x + rand(length(x))/20;
 	par,er = fitpoly(x,y,deg=1);
 	@test par[1] ≈ 0.1 atol=0.001
