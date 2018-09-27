@@ -1,9 +1,7 @@
-import LsqFit
-
 """
 	fitexp(x,y)
 Fit exponential curve with offset assuming following function:
-y = p[1] + p[2]\*exp.(p[3].\*x)
+y = p[1] + p[2]*exp.(p[3].*x)
 
 **Input: Vectors**
 * x: x coordinate vector (Float64 or DateTime)
@@ -15,7 +13,7 @@ y = p[1] + p[2]\*exp.(p[3].\*x)
 **Example**
 ```
 x = collect(1.:1:10*365)./365;
-y = 1869.9 - 782.*exp.(-0.085.*x) + rand(length(x))*20;
+y = 1869.9 .- 782.0 .* exp.(-0.085.*x) .+ rand(length(x)).*20;
 par,er = fitexp(x,y);
 ```
 """
@@ -23,15 +21,15 @@ function fitexp(x::Vector{Float64},y::Vector{Float64})
 	x,y = fitprep(x,y);
 	function fitexp_guess()
 		# First guess based on: https://math.stackexchange.com/questions/1337601/fit-exponential-with-constant
-		s = Vector{Float64}(length(y));
+		s = Vector{Float64}(undef,length(y));
 		s[1] = 0;
 		for i = 2:length(y)
 			s[i] = s[i-1] + 0.5*(y[i]+y[i-1])*(x[i]-x[i-1]);
 		end
-		mat1 = [sum((x-x[1]).^2) sum((x-x[1]).*s);
-				sum((x-x[1]).*s) sum(s.^2)];
-		mat2 = [sum((y-y[1]).*(x-x[1]));
-				sum((y-y[1]).*s)];
+		mat1 = [sum((x.-x[1]).^2) sum((x.-x[1]).*s);
+				sum((x.-x[1]).*s) sum(s.^2)];
+		mat2 = [sum((y.-y[1]).*(x.-x[1]));
+				sum((y.-y[1]).*s)];
 		ac = mat1\mat2;
 		psi = exp.(ac[2]*x);
 		mat3 = [length(y) sum(psi);
@@ -56,8 +54,8 @@ Evaluate/compute exponential function using given parameters and x coordinate
 
 **Input**
 * x: x coordinate Vector{DateTime or Float64} or Vector{Float64}
-* par: vector with 3 parameters: par[1] + par[2]\*exp.(x.\*par[3])
-* par: vector with 2 parameters: par[1]\*exp.(x.\*par[2])
+* par: vector with 3 parameters: par[1] + par[2]*exp.(x.*par[3])
+* par: vector with 2 parameters: par[1]*exp.(x.*par[2])
 
 **Output**
 * evaluated values for given parameters (=y)
@@ -70,7 +68,7 @@ y = evalexp(x,[1869.9,-782.,-0.085]);
 """
 function evalexp(x::Vector{Float64},par::Vector{Float64})
 	if length(par) == 3
-		return par[1] + par[2].*exp.(x.*par[3])
+		return par[1] .+ par[2].*exp.(x.*par[3])
 	else
 		return par[1].*exp.(x.*par[2])
 	end
@@ -100,7 +98,7 @@ x0,y0 = fitprep(x,y);
 """
 function fitprep(x::Vector{Float64},y::Vector{Float64})
 	x0,y0 = copy(x),copy(y);
-	r = find(isnan,x+y);
+	r = findall(isnan,x+y);
 	deleteat!(x0,r);
 	deleteat!(y0,r);
 	return x0,y0;
@@ -122,7 +120,7 @@ Polynomial fitting based on LsqFit while removing NA values prior fitting
 **Example**
 ```
 x = collect(1.:1:365);
-y = 10. + 0.1*x + rand(length(x))/2;
+y = 10. + 0.1 .* x .+ rand(length(x))./2;
 par,er = fitpoly(x,y,deg=1);
 ```
 """
@@ -169,6 +167,7 @@ model: function to be fitted
 x: x coordinates vector (not Vector)
 y: y values (vector). NA values on input will not be corrected!
 approx_val: approximated values of the model parameters
+conifd: alfa for confidence interval (default = 0.05)
 
 **Output**
 * (estimated parameters, error bars at requested confidence)
@@ -176,15 +175,15 @@ approx_val: approximated values of the model parameters
 **Example**
 ```
 x = collect(1.:1:365);
-y = 10. + 0.1*x + rand(length(x))/2;
+y = 10.0 .+ 0.1 .* x .+ rand(length(x))./2;
 par,er = fitmodel((x,p)-> p[1] + p[2].*x,x,y,[0.1, 1]);
 
 ```
 """
 function fitmodel(model::Function,x::Vector{Float64},y::Vector{Float64},
-					approx_val::Vector{Float64};confid::Float64=0.95)
+					approx_val::Vector{Float64};confid::Float64=0.05)
 	fit = LsqFit.curve_fit(model,x,y,approx_val);
-	return fit.param, LsqFit.estimate_errors(fit, confid)
+	return fit.param, LsqFit.margin_error(fit, 1 - confid)
 end
 
 """
@@ -195,13 +194,13 @@ function getpolymodel(deg::Int64=1)
 	if deg == 0
 		return model0(x,p) = p*ones(length(x));
 	elseif deg == 1
-		return model1(x,p) = p[1].*x+p[2];
+		return model1(x,p) = p[1].*x .+ p[2];
 	elseif deg == 2
-		return model2(x,p) = p[1].*x.^2+p[2].*x+p[3];
+		return model2(x,p) = p[1].*x.^2 .+ p[2].*x .+ p[3];
 	elseif deg == 3
-		return model3(x,p) = p[1].*x.^3+p[2].*x.^2+p[3].*x+p[4];
+		return model3(x,p) = p[1].*x.^3 .+ p[2].*x.^2 .+ p[3].*x .+ p[4];
 	elseif deg == 4
-		return model4(x,p) = p[1].*x.^4+p[2].*x.^3+p[3].*x.^2+p[4].*x+p[5];
+		return model4(x,p) = p[1].*x.^4 .+ p[2].*x.^3 .+ p[3].*x.^2 .+ p[4].*x .+ p[5];
 	else
 		return NaN;
 	end

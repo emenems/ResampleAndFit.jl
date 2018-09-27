@@ -27,14 +27,14 @@ out = fillnans(data[:Temp],2);
 
 # To find indices corresponding to corrected values just search for difference
 # `fillnans` was called:
-corrindex = find(isnan.(data[:Temp]) .& !isnan.(out)); # will return [5]
+corrindex = findall(isnan.(data[:Temp]) .& !isnan.(out)); # will return [5]
 
 # NaN will NOT be replaced as the missing window is too long (3>2)
 data[:Grav] = fillnans(data[:Grav],2);
 ```
 """
 function fillnans(datavec::Vector{Float64},maxgap::Int)
-   const nanlines = .!isnan.(datavec);
+   nanlines = .!isnan.(datavec);
    dataout = copy(datavec);
    for i in 2:length(datavec)-1
 	   if nanlines[i]==false # only for NaNs

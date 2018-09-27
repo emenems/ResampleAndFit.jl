@@ -1,7 +1,12 @@
 module ResampleAndFit
 
 using DataFrames
+using Dates
+using Statistics
 import FileTools
+import LsqFit
+import DSP
+
 include("fitdata.jl")
 include("resampledata.jl")
 include("interpdata.jl")

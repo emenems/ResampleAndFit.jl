@@ -9,7 +9,7 @@ In addition, steps in input time series can by corrected.
 Should contain following parameters (keys):
 column = number of a data column or name/key (if number & :datetime in first column: ++column)
 id = type of correction: 1=step, 2=set interval to NaN, 3=set interval to interpolated values
-5=set interval to given values (linspace between y1 and y2) (id=4 not yet implemented).
+5=set interval to given values (range between y1 and y2) (id=4 not yet implemented).
 x1,x2 = starting,end time of the interval
 y1,y2 = step correction: value at before at after step (id=1) | values used to replace interval (see id=5). If id=0 and y1==0.0 && isnan(y2), than difference is set to zero
 * includetime: switch to either to apply correction to time including x1/x2 or just > & < (true: => & <=)
@@ -21,9 +21,9 @@ y1,y2 = step correction: value at before at after step (id=1) | values used to r
 ```
 datain = DataFrame(
 		   datetime=collect(DateTime(2010,1,1,3):Dates.Minute(30):DateTime(2010,1,2,12)),
-		   grav = zeros(Float64,67)+9.8,
-		   pres = zeros(Float64,67)+1000.,
-		   temp = zeros(Float64,67)+27.);
+		   grav = zeros(Float64,67) .+ 9.8,
+		   pres = zeros(Float64,67) .+ 1000.,
+		   temp = zeros(Float64,67) .+ 27.);
 corrfile = "f:/mikolaj/code/libraries/matlab_octave_library/test/input/correctTimeInterval_inputFile.txt"
 dataout = correctinterval(datain,corrfile);
 # Set parameters directly and overwrite the input dataframe
@@ -73,12 +73,12 @@ Auxiliary function to correct step in time series
 """
 function correctinterval_step!(datain,corrpar,i,includetime)
 	# find points recorded after the step occur.
-	r = includetime ? find(x->x .>= corrpar[:x2][i], datain[:datetime]) :
-					  find(x->x .> corrpar[:x2][i], datain[:datetime]);
+	r = includetime ? findall(x->x .>= corrpar[:x2][i], datain[:datetime]) :
+					  findall(x->x .> corrpar[:x2][i], datain[:datetime]);
 	# check if both values are given (if second not, then set diff. to 0)
 	if !isnan(corrpar[:y1][i]) && isnan(corrpar[:y2][i])
-		r1 = includetime ? find(x->x .>= corrpar[:x1][i], datain[:datetime]) :
-						  find(x->x .> corrpar[:x1][i], datain[:datetime]);
+		r1 = includetime ? findall(x->x .>= corrpar[:x1][i], datain[:datetime]) :
+						  findall(x->x .> corrpar[:x1][i], datain[:datetime]);
 		applyDiff = datain[corrpar[:column][i]][r[1]] -
 						datain[corrpar[:column][i]][r1[1]] -
 							corrpar[:y1][i];
@@ -125,7 +125,7 @@ function correctinterval_replace!(datain,corrpar,i,includetime)
 	# find points recorded in-between given time epochs.
 	r = findinterval(datain[:datetime],corrpar[:x1][i],corrpar[:x2][i],
 						includetime=includetime)
-	rep_val = linspace(corrpar[:y1],corrpar[:y2],length(r));
+	rep_val = range(corrpar[:y1],stop=corrpar[:y2],length=length(r));
 	for (j,v) in enumerate(r)
 		datain[corrpar[:column][i]][v] = rep_val[j][1];
 	end
@@ -135,8 +135,8 @@ end
 Auxiliary function to find interval between two points
 """
 function findinterval(timein,x1,x2;includetime::Bool=true)
-	r = includetime ? find(x->x .>= x1 && x .<= x2,timein) :
-					  find(x->x .> x1 && x .< x2,timein);
+	r = includetime ? findall(x->x .>= x1 && x .<= x2,timein) :
+					  findall(x->x .> x1 && x .< x2,timein);
 end
 
 """
@@ -160,7 +160,7 @@ manually updated)
 ```
 dfin = DataFrame(Temp = collect(0.:1.:12.),
 	 datetime= collect(DateTime(2000,1,1):Dates.Hour(1):DateTime(2000,1,1,12)))
-dfin[:Temp][[6,10,11]] = NaN;
+dfin[:Temp][[6,10,11]] .= NaN;
 min_gap = 2; # corresponds to 2 hours (see datetime column)
 corrpar = prepcorrpar(dfin[:Temp],dfin[:datetime],min_gap=min_gap,
 					defcol=:Temp,defid=2);
@@ -172,13 +172,13 @@ function prepcorrpar(datain,timein::Vector{DateTime};
 	nstart,nstop = ResampleAndFit.findnanblocks(datain);
 	outlength = length(nstart);
 	if !isempty(nstart)
-		corrpar = DataFrame(column = repmat([defcol],outlength),
-				id = repmat([defid],outlength),
+		corrpar = DataFrame(column = repeat([defcol],outlength),
+				id = repeat([defid],outlength),
 				x1 = timein[nstart],
 				x2 = timein[nstop],
 				y1 = zeros(outlength).+NaN,
 				y2 = zeros(outlength).+NaN;
-				comment = repmat(["automatically_generated_using_preparecorrpar"],outlength));
+				comment = repeat(["automatically_generated_using_preparecorrpar"],outlength));
 		# remove rows where gap is too short
 		deleterows!(corrpar,prepcorrpar_remrow(nstart,nstop,min_gap))
 		corrpar = size(corrpar,1) == 0 ? DataFrame() : corrpar; # return empty if all columns deleted

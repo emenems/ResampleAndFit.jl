@@ -15,12 +15,12 @@ Cutting of edges is the only difference between Julias `conv` and this function
 **Example**
 ```
 t = collect(1:1:400.);
-s = sin.(2*pi*1/50.*t) + randn(length(t))./6;
+s = sin.(2*pi*1/50.*t) .+ randn(length(t))./6;
 sf = mmconv(s,ones(7)./7);
 ```
 """
 function mmconv(sig::Vector{Float64},imp::Vector{Float64})
-	outsig = conv(sig,imp);
+	outsig = DSP.conv(sig,imp);
 	return correctconv(outsig,length(imp));
 end
 
@@ -48,8 +48,8 @@ function correctconv(sig::Vector{Float64},impl::Int)
 	# Remove phase shift
 	out = sig[1+temp:end-temp];
 	# Remove filter/edge effect
-	out[1:temp] = NaN; # left
-	out[end-temp+1:end] = NaN; # right
+	out[1:temp] .= NaN; # left
+	out[end-temp+1:end] .= NaN; # right
 	return out;
 end
 
@@ -67,12 +67,12 @@ Find blocks without NaNs
 **Example**
 ```
 invec = collect(1.:1:17.);
-invec[[6,10,11,12,14,17]] = NaN;
+invec[[6,10,11,12,14,17]] .= NaN;
 istart,istop = findblocks(invec);
 ```
 """
 function findblocks(invec::Vector{Float64})
-	idall = find(isnan.(invec));
+	idall = findall(isnan.(invec));
 	findblocks_decide(idall,length(invec));
 end
 
@@ -84,8 +84,8 @@ function findblocks_decide(idall::Vector{Int},length_invec::Int)
 	end
 end
 function findblocks_main(idall::Vector{Int},length_invec::Int)
-	idstart = Vector{Int}(0);
-	idstop = Vector{Int}(0);
+	idstart = Vector{Int}();
+	idstop = Vector{Int}();
 	for i in 1:length(idall)
 		if i == 1 && i != idall[1]
 			push!(idstart,1);
@@ -117,7 +117,7 @@ Find blocks of NaNs
 **Example**
 ```
 invec = collect(1.:1:17.);
-invec[[6,10,11,12,14,17]] = NaN;
+invec[[6,10,11,12,14,17]] .= NaN;
 nstart,nstop = findnanblocks(invec);
 ```
 """
@@ -151,14 +151,14 @@ See `mmconv` help for **Input** and **Output**
 **Example**
 ```
 t = collect(1:1:100.);
-s = sin.(2*pi*1/20.*t) + randn(length(t))./6;
-s[40:49] = NaN;
+s = sin.(2*pi*1/20.*t) .+ randn(length(t))./6;
+s[40:49] .= NaN;
 sf = filtblocks(s,ones(5)./5);
 ```
 """
 function filtblocks(sig::Vector{Float64},imp::Vector{Float64})
 	id1,id2 = findblocks(sig);
-	out = Vector{Float64}(length(sig)).+NaN;
+	out = Vector{Float64}(undef,length(sig)) .+ NaN;
 	for i in 1:1:length(id1)
 		if id2[i]-id1[i] > length(imp)*2.
 			out[id1[i]:id2[i]] = mmconv(sig[id1[i]:id2[i]],imp);
@@ -179,7 +179,7 @@ subtract mean value from input Vector
 
 **Example**
 ```
-s = [-1.,NaN,0.,1.]+1.234
+s = [-1.,NaN,0.,1.] .+ 1.234
 sf = demean(s);
 ```
 """
@@ -191,7 +191,7 @@ function demean(sig::Vector{Float64})::Vector{Float64}
 			s += i;
 		end
 	end
-	return sig - s/c
+	return sig .- s/c
 end
 
 """

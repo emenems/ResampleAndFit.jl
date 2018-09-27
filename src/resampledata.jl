@@ -188,7 +188,7 @@ Auxiliary function to return all column numbers except for input name
 * list of indices
 """
 function allexcept(head,name)
-	index = Vector{Int64}(0);
+	index = Vector{Int64}();
 	for (i,val) in enumerate(head)
 		if val != name
 			push!(index,i)

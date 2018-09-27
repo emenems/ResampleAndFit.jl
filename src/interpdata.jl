@@ -61,7 +61,7 @@ function interp1(x,y,xi)
 	maxx = maximum(x);minx = minimum(x);
 	for i = 1:length(out)
         if (xi[i] <= maxx) && (xi[i] >= minx)
-            out[i] = itp[xi[i]];
+            out[i] = itp(xi[i]);
 		else
 			out[i] = NaN;
         end
@@ -173,7 +173,7 @@ function interp2(x::Vector{Float64},y::Vector{Float64},z::Matrix{Float64},
 	for i in 1:length(xi[:])
 		# do not extrapolate!
 		if (xi[i] >= minx && yi[i] >= miny) && (xi[i] <= maxx && yi[i] <= maxy)
-		   zi[i] = itp[yi[i],xi[i]] # use yi,xi order as matlab sorts masgrid in different order
+		   zi[i] = itp(yi[i],xi[i]) # use yi,xi order as matlab sorts masgrid in different order
 		else
 		   zi[i] = NaN;
 		end

@@ -8,19 +8,19 @@ function fillnans_test()
 	@test all(.!isnan.(out)) == true
 	# To find indices corresponding to corrected values just search for difference
 	# `fillnans` was called:
-	corrindex = find(isnan.(data[:Temp]) .& .!isnan.(out)); # will return [5]
+	corrindex = findall(isnan.(data[:Temp]) .& .!isnan.(out)); # will return [5]
 	@test corrindex == [5]
 
 	# NaNs will NOT be replaced as the missing window is too long (3>2), except
 	# for the last NaN
 	out2 = fillnans(data[:Grav],2);
-	@test find(isnan.(data[:Grav]) .& .!isnan.(out2)) == [7]
+	@test findall(isnan.(data[:Grav]) .& .!isnan.(out2)) == [7]
 	@test out2[7] ≈ 7.0
 
 	# NaNs will be replace as window is longer (or equal to missing gap)
 	out3 = fillnans(data[:Grav],3);
-	@test find(isnan.(data[:Grav]) .& .!isnan.(out3)) == [3,4,5,7]
-	@test sum(out3[[3,4,5,7]]) ≈ 3.+4.+5.+7.
+	@test findall(isnan.(data[:Grav]) .& .!isnan.(out3)) == [3,4,5,7]
+	@test sum(out3[[3,4,5,7]]) ≈ 3+4+5+7.0
 end
 
 function replacenans_test()
