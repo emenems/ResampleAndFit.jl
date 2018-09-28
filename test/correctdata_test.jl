@@ -7,7 +7,7 @@ function corrinterval_test()
     inan = [5,6];
     datain[:grav][inan] .= NaN;
 	datain[:pres][inan] .= NaN;
-	corrfile = joinpath(pwd(),"test/input/correctTimeInterval_inputFile.txt");
+	corrfile = joinpath(dirname(@__DIR__),"test","input","correctTimeInterval_inputFile.txt");
 	dataout = correctinterval(datain,corrfile,includetime=false);
 	## Interpolated values
 	# check if only :grav column was corrected
@@ -67,7 +67,7 @@ function correctdata_test2()
 			   temp = zeros(Float64,34) .+ 27.);
     datain[:temp][5:end] .+= 3;
 	datain[:temp][33:end] .+= 1;
-	corrfile = joinpath(pwd(),"test/input/correctTimeInterval_inputFile2.txt");
+	corrfile = joinpath(dirname(@__DIR__),"test","input","correctTimeInterval_inputFile2.txt");
 	dataout = correctinterval(datain,corrfile,includetime=true);
 	@test sum(dataout[:temp]) == 27.0*length(dataout[:temp])+2.0
 	# all others are unchanged
