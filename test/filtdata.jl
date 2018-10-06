@@ -1,4 +1,4 @@
-function mmconv_test()
+@testset "Filter time series" begin
 	sig = ones(15);
 	imp = ones(5)./5;
 	filtsig = mmconv(sig,imp);
@@ -7,9 +7,7 @@ function mmconv_test()
 		@test isnan(filtsig[i])
 	end
 	@test length(filtsig) == 15
-end
 
-function findblocks_test()
 	invec = collect(1.:1:17.);
 	invec[[6,10,11,12,14,17]] .= NaN;
 	start1,stop1 = findblocks(invec);
@@ -25,9 +23,7 @@ function findblocks_test()
 	start3,stop3 = findblocks([1.,2.,3.,4.,5.]);
 	@test start3 == [1];
 	@test stop3 == [5]
-end
 
-function findnanblocks_test()
 	invec = collect(1.:1:17.);
 	invec[[6,10,11,12,14,17]] .= NaN;
 	start1,stop1 = findnanblocks(invec);
@@ -43,9 +39,7 @@ function findnanblocks_test()
 	start3,stop3 = findnanblocks([1.,2.,3.,4.,5.]);
 	@test isempty(start3)
 	@test isempty(stop3)
-end
 
-function filtblocks_test()
 	sig = vcat(ones(10),NaN,ones(12) .+ 1);
 	out = filtblocks(sig,ones(3)./3);
 	for i in [1,10,11,12,length(sig)]
@@ -54,7 +48,7 @@ function filtblocks_test()
 	@test sum(filter(!isnan,out)) ≈ 8+10*2.0
 end
 
-function demean_test()
+@testset "De-mean & -trend" begin
 	o = [-1.,NaN,0.,1.];
 	s = o .+ 1.234
 	sf = demean(s)
@@ -65,9 +59,7 @@ function demean_test()
 			@test isnan(v)
 		end
 	end
-end
 
-function detrend_test()
 	x = collect(1.:1:10);
 	y = ones(length(x));
 	yc0 = detrend(x,y,deg=0);
@@ -76,11 +68,3 @@ function detrend_test()
 	yc1 = detrend(x,x .* 0.5,deg=1);
 	@test isapprox(sum(yc1),0.0,atol=1e-10)
 end
-
-# run
-mmconv_test();
-findblocks_test();
-filtblocks_test();
-demean_test();
-findnanblocks_test();
-detrend_test();

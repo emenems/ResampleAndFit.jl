@@ -1,4 +1,4 @@
-function corrinterval_test()
+@testset "Correct interval: apply" begin
 	datain = DataFrame(
 			   datetime=collect(DateTime(2010,1,1,3):Dates.Minute(30):DateTime(2010,1,2,12)),
 			   grav = zeros(Float64,67) .+ 9.8,
@@ -57,9 +57,7 @@ function corrinterval_test()
 						y1 = [0.0],y2 = [1.0]);
 	correctinterval!(datain,corrpar);
 	@test datain[:pres][1:4] == collect(range(0.,stop=1.,length=4));
-end
-
-function correctdata_test2()
+	#
 	datain = DataFrame(
 			   datetime=collect(DateTime(2010,1,1,3):Dates.Minute(60):DateTime(2010,1,2,12)),
 			   grav = zeros(Float64,34) .+ 9.8,
@@ -76,7 +74,7 @@ function correctdata_test2()
 	end
 end
 
-function prepcorrpar_test()
+@testset "Correct interval: prepare" begin
 	dfin = DataFrame(Temp = collect(0.:1.:12.),
 		 datetime= collect(DateTime(2000,1,1):Dates.Hour(1):DateTime(2000,1,1,12)))
 	dfin[:Temp][[6,10,11]] .= NaN;
@@ -87,7 +85,3 @@ function prepcorrpar_test()
 	@test corrpar[:column][1] == :Temp
 	@test corrpar[:id][1] == 2
 end
-# run
-corrinterval_test();
-correctdata_test2();
-prepcorrpar_test();

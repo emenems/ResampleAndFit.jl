@@ -1,5 +1,4 @@
-# interpdf
-function interpdf_test()
+@testset "Interpolate 1D" begin
 	df = DataFrame(Temp=[10,11,12,14],Humi=[40.,NaN,50,60],
 	      datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
 	      DateTime(2010,1,1,2),DateTime(2010,1,1,4)]);
@@ -8,15 +7,10 @@ function interpdf_test()
 	@test isnan(dfi[:Humi][1])
 	@test isnan(dfi[:Humi][2])
 	@test isnan(dfi[:Temp][2])
-end
-
-# interp1
-function interp1_test()
 	@test interp1([1,2,3,4],[10,20,30,40],[1.5]) ≈ [15.]
 end
 
-# mesghrid + mesh2vec
-function meshgrid_test()
+@testset "Interpolate 2D" begin
 	# meshgrid
 	x = [1,2,3,4];
 	y = [10,20,30,40];
@@ -30,10 +24,8 @@ function meshgrid_test()
 	x,y = mesh2vec(xi,yi);
 	@test x[end] == 4
 	@test y[1] == 10
-end
 
-# interp2
-function interp2_test()
+	# interp2
 	x = [1.,2.,3.,4.,5.,];
 	y = [2.,3.,4.,5.,6.,7.,8.];
 	z = ones(Float64,(length(y),length(x)));
@@ -58,8 +50,3 @@ function interp2_test()
 	zi = interp2(x,y,z,xi,yi);
 	@test zi ≈ [1.0 1.0; 1.0 1.0];
 end
-
-interpdf_test()
-interp1_test()
-meshgrid_test()
-interp2_test()

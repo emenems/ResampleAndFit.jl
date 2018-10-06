@@ -1,4 +1,4 @@
-function mergetimeseries_test()
+@testset "Merge time series" begin
 	data1 = DataFrame(Temp=[10.,20,30,40],
 	       datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
 	         DateTime(2010,1,1,2),DateTime(2010,1,1,4)]);
@@ -23,5 +23,3 @@ function mergetimeseries_test()
 	@test dataout[:pres][[2,3,4,5]] == data3[:pres]
 	@test isnan(dataout[:pres][1])
 end
-
-mergetimeseries_test();

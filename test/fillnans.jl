@@ -1,4 +1,4 @@
-function fillnans_test()
+@testset "Fill NaNs" begin
 	# NaN will be replaced by interpolated value
 	data = DataFrame(Temp=[10.,11.,12.,14.,NaN, 14.,15.,16],
 		Grav=[1.,2.,NaN,NaN,NaN,6.,NaN,8.],
@@ -23,7 +23,7 @@ function fillnans_test()
 	@test sum(out3[[3,4,5,7]]) ≈ 3+4+5+7.0
 end
 
-function replacenans_test()
+@testset "Replace NaNs and NAs" begin
 	data1 = DataFrame(Temp=[10.,NaN,30.,40.],
 					  pres=[1.0,2.0,NaN,4.0],
 		   	datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
@@ -31,9 +31,7 @@ function replacenans_test()
  	replacenans!(data1,0.0)
 	@test data1[:Temp] == [10.,0.0,30.,40.]
 	@test data1[:pres] == [1.0,2.0,0.0,4.0]
-end
 
-function na2nan_test()
 	data1 = DataFrame(Temp=[10,missing,30,40],
 					  pres=[1.0,2.0,NaN,4.0],
 		   	datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,1),
@@ -45,7 +43,3 @@ function na2nan_test()
 	@test !ismissing(data1[:pres][3])
 	@test isnan(data1[:pres][3])
 end
-# run
-fillnans_test();
-na2nan_test();
-replacenans_test();

@@ -1,5 +1,9 @@
 ResampleAndFit
 ============
+[![Build Status](https://travis-ci.org/emenems/ResampleAndFit.jl.svg?branch=master)](https://travis-ci.org/emenems/ResampleAndFit.jl)
+[![codecov](https://codecov.io/gh/emenems/ResampleAndFit.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/emenems/ResampleAndFit.jl)
+[![Coverage Status](https://coveralls.io/repos/github/emenems/ResampleAndFit.jl/badge.svg?branch=master)](https://coveralls.io/github/emenems/ResampleAndFit.jl?branch=master)
+
 This repository contains functions related to **re-sampling**, simple curve **fitting**, and **filtering** of time series/DataFrames.  
 
 ## Re-sampling options:
@@ -16,7 +20,7 @@ _Auxiliary functions_:
 * `isregular`: check if the input time vector (data) is regularly sampled
 * `meshgrid`: use Matlab-like [meshgrid](https://www.mathworks.com/help/matlab/ref/meshgrid.html) matrices
 * `mesh2vec`: convert meshgrid matrices to vectors
-* `cut2interval!`: cut the input dataframe to required time interval 
+* `cut2interval!`: cut the input dataframe to required time interval
 
 ## Fitting options:
 * `fitexp`: fit exponential curve with an offset (a + b\*exp(c\*t))
@@ -43,6 +47,6 @@ _Auxiliary functions_:
 * `mergetimeseries`: merge DataFrames with DateTime
 
 ## Usage
-* Check the function help for instructions and example usage
+* Check the function help for instructions and example usage, e.g., `?aggregate2`
 
 > Check the REQUIRE file for package dependency

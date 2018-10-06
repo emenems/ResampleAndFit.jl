@@ -1,5 +1,5 @@
 # aggregate2: find minimum including NAs
-function aggeregate2_test()
+@testset "Aggregate data" begin
 	dfi = DataFrame(Temp=[10,11,14,1,2,missing,4],
 	   		datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,6),
 	         		  DateTime(2010,1,1,18),
@@ -15,8 +15,7 @@ function aggeregate2_test()
 	@test dfa[2,1] == 1+2+4
 end
 
-# time2regular
-function time2regular_test()
+@testset "Time regularization" begin
 	dfi = DataFrame(Temp=[10,11,14,1,2,missing,4],
 	   		datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,6),
 	         		  DateTime(2010,1,1,18),
@@ -26,10 +25,7 @@ function time2regular_test()
 	reg_sample = time2regular(dfi,timecol=:datetime,resol=Dates.Hour(6))
 	@test size(reg_sample,1) == 8
 	@test ismissing(reg_sample[3,1])
-end
 
-# isregular
-function isregular_test()
 	# Test irregular
 	dfi = DataFrame(Temp=[10,11,14,1,2,missing,4],
 	   		datetime=[DateTime(2010,1,1,0),DateTime(2010,1,1,6),
@@ -44,7 +40,7 @@ function isregular_test()
 	@test isregular(timevec) == true
 end
 
-function cut2interval_test()
+@testset "Cut 2 time interval" begin
 	datain = DataFrame(datetime=collect(DateTime(2000,1,1):Dates.Day(1):DateTime(2000,1,12)),
 						 somevalues=collect(1:1:12))
 	datatest = deepcopy(datain);
@@ -69,8 +65,3 @@ function cut2interval_test()
 	cut2interval!(datatest,starttime,endtime,keepedges=(true,true))
 	@test datatest == datain
 end
-
-aggeregate2_test();
-time2regular_test();
-isregular_test();
-cut2interval_test()
