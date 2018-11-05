@@ -67,4 +67,14 @@ end
 
 	yc1 = detrend(x,x .* 0.5,deg=1);
 	@test isapprox(sum(yc1),0.0,atol=1e-10)
+
+	o = [-1.,NaN,0.,1.];
+	sf = defirst(o)
+	for (i,v) in enumerate(sf)
+		if i != 2
+			@test v ≈ o[i]-o[1]
+		else
+			@test isnan(v)
+		end
+	end
 end

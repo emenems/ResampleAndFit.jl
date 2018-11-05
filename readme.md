@@ -33,6 +33,7 @@ _Auxiliary functions_:
 * `filtblocks`: apply `mmconv` for filtering of input signal that may contain NaNs (=piecewise filtering)
 * `demean`: subtract mean value from input data
 * `detrend`: subtract polynomial fit from input data
+* `defirst`: subtract first not NaN value from imput data
 
 _Auxiliary functions_:  
 * `findblocks`: find time intervals (blocks) without NaNs (e.g. to allow for piecewise filtering)

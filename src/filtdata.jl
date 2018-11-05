@@ -226,3 +226,30 @@ function detrend(x,y;deg::Int=1)
 		return y - ResampleAndFit.evalpoly(x,fit);
 	end
 end
+
+"""
+	defirst(sig)
+subtract first not NaN value from input Vector
+
+**Input:**
+* sig: data to be reduced (can contain NaNs)
+
+**Output**
+* outsig: data after subtraction of fist not NaN value
+
+**Example**
+```
+s = [-1.,NaN,0.,1.];
+sf = defirst(s);
+```
+"""
+function defirst(sig::Vector{Float64})::Vector{Float64}
+	s = 0.;
+	for i in sig
+		if !isnan(i)
+			s = i;
+			break;
+		end
+	end
+	return sig .- s
+end
