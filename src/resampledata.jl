@@ -28,7 +28,7 @@ dataa = aggregate2(data,resol=Dates.Day(1),fce=x->minimum(collect(skipmissing(x)
 """
 function aggregate2(data::DataFrame;
 					timecol=:datetime,resol=Dates.Hour(1),
-					fce=sum)
+					fce=sum,rename=false)
 	dfc,datestringcol = addTimeString(data,resol,timecol);
 	# do not use datetime for aggregation (not supported)
 	useonly = allexcept(names(dfc),timecol);
@@ -40,6 +40,14 @@ function aggregate2(data::DataFrame;
 		dfc[timecol] = convert(Vector{DateTime},dfc[timecol]);
 	end
 	delete!(dfc,:datestringcol);
+	if rename==true
+		for i in names(dfc)
+			temp = string(i) |> x-> findlast("_",x);
+			if typeof(temp)!=Nothing
+				rename!(dfc,i=>Symbol(string(i)[1:collect(temp)[1]-1]));
+			end
+		end
+	end
 	return dfc
 end
 

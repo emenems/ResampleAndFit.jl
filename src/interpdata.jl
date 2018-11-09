@@ -23,9 +23,10 @@ datai = interpdf(data,[DateTime(2010,1,1,12,0,0)]);
 """
 function interpdf(data::DataFrame,timevec::Vector{DateTime};timecol=:datetime)
 	# prepare input time vector for interpolation
-	x,xi,dfi = preptime(data[timecol],timevec);
+	x,xi = preptime(data[timecol],timevec);
 	# run for all input columns except for DateTime (x vector) and Types not
 	# suitable for interpolation
+	dfi = DataFrame(datetime=timevec);
 	for i in names(data)
 		if (i != timecol) && (eltype(data[i]) <: Real)
 			dfi[i] = interp1(x,data[i],xi);
@@ -69,6 +70,10 @@ function interp1(x,y,xi)
     return out;
 end
 
+function interp1(x::Vector{DateTime},y::Vector{Float64},xi::Vector{DateTime})
+	t1,t2 = preptime(x,xi);
+	return interp1(t1,y,t2)
+end
 """
 	preptime(dft,timevec)
 
@@ -79,8 +84,7 @@ Will convert DateTime to Number/Int and declare/create output (length) dataframe
 function preptime(dft::Vector{DateTime},timevec::Vector{DateTime})
 	x = Dates.value.(dft);
 	xi = Dates.value.(timevec);
-	dfi = DataFrame(datetime=timevec);
-	return x, xi, dfi
+	return x, xi
 end
 
 """

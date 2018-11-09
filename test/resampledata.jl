@@ -13,6 +13,9 @@
 	dfa = aggregate2(dfi,resol=Dates.Day(1),fce=x->sum(collect(skipmissing(x))))
 	@test dfa[1,1] == 10+11+14
 	@test dfa[2,1] == 1+2+4
+
+	dfc = aggregate2(dfi,resol=Dates.Day(1),fce=maximum,rename=true);
+	@test names(dfc) == [:Temp,:datetime]
 end
 
 @testset "Time regularization" begin

@@ -8,6 +8,9 @@
 	@test isnan(dfi[:Humi][2])
 	@test isnan(dfi[:Temp][2])
 	@test interp1([1,2,3,4],[10,20,30,40],[1.5]) ≈ [15.]
+
+	@test interp1([DateTime(2000,1,1),DateTime(2000,1,2)],[0.0,1.0],
+					[DateTime(2000,1,1,12,0,0)]) ≈ [0.5]
 end
 
 @testset "Interpolate 2D" begin
