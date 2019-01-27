@@ -13,6 +13,7 @@ This repository contains functions related to **re-sampling**, simple curve **fi
 * `fillnans`: replace NaN values by linearly interpolated values as long as the missing interval is shorter than given (input) maximum gap
 * `replacenans`: replace all NaNs with given value (for Float64 type only)
 * `na2nan`: convert NAs in DataFrame to NaNs (for Float64 type only)
+* `missing2nan`: convert input Vector (or DataFrame) of type Array{Missing,x} to Array{x}
 * `interp2`: use [Matlab-like](https://www.mathworks.com/help/matlab/ref/interp2.html) 2D interpolation
 
 _Auxiliary functions_:  

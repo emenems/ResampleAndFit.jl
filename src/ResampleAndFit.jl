@@ -19,7 +19,7 @@ export aggregate2, time2regular, isregular, getresolution, cut2interval!
 export interpdf, interp1, meshgrid, mesh2vec, interp2
 export fitexp, evalexp, fitpoly, evalpoly
 export mmconv, findblocks, filtblocks, demean, findnanblocks, detrend, defirst
-export fillnans, replacenans!, na2nan!
+export fillnans, replacenans!, na2nan!, missing2nan
 export correctinterval, correctinterval!, prepcorrpar
 export mergetimeseries
 

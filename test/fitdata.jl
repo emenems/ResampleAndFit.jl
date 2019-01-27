@@ -15,4 +15,15 @@
 	@test sum(er) < 1e-2
 
 	@test evalpoly([10.],[0.01, 0.1, 1.0]) ≈ [1+0.1*10+0.01*10*10]
+	
+	@test evalpoly([DateTime(1,1,1,0,1)],[0.01, 0.1, 1.0]) ≈ [1+0.1*86460000+0.01*86460000.0^2]
+	
+	## Test model creation
+	m = ResampleAndFit.getpolymodel(0)
+	@test m([10.,20.],2.0) == [2.0, 2.0]
+	m = ResampleAndFit.getpolymodel(3)
+	@test m(1,[4.,3.,2.,1]) == sum([4.,3.,2.,1])
+	m = ResampleAndFit.getpolymodel(4)
+	@test m(1,[5.,4.,3.,2.,1]) == sum([5.,4.,3.,2.,1])
+	@test isnan(ResampleAndFit.getpolymodel(10))
 end

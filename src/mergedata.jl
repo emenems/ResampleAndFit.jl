@@ -28,7 +28,7 @@ dataout = mergetimeseries(data1,data2,data3,timecol=:datetime,kind=:outer);
 function mergetimeseries(args...;timecol=:datetime,kind=:outer)
 	# use first as reference
 	dataout,datestringcol = ResampleAndFit.addTimeString(args[1],Dates.Second(1),timecol);
-	delete!(dataout,timecol); # can be deleted as the time infor is in datestringcol
+	deletecols!(dataout,timecol); # can be deleted as the time infor is in datestringcol
 	for i in 2:length(args)
 		# add time string
 		dfc,temp = ResampleAndFit.addTimeString(args[i],Dates.Second(1),timecol);
@@ -38,7 +38,7 @@ function mergetimeseries(args...;timecol=:datetime,kind=:outer)
 	end
 	# convert datestring to datetime
 	dataout[timecol] = DateTime.(dataout[:datestringcol],datestringcol)
-	delete!(dataout,:datestringcol)
+	deletecols!(dataout,:datestringcol)
 	na2nan!(dataout); # replace NAs
 	return DataFrames.sort!(dataout, [order(:datetime)])
 end

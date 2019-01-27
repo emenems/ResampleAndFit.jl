@@ -43,3 +43,47 @@ end
 	@test !ismissing(data1[:pres][3])
 	@test isnan(data1[:pres][3])
 end
+
+@testset "Convert missing to NaNs" begin
+	df = DataFrame(datetime=[DateTime(2000),DateTime(2001)],
+				datetime2 = [DateTime(2002),missing],
+				grav=[missing,3.],
+				pres=[1,missing],
+				temp=[missing,missing]);
+	df[:datetime3] = convert(Array{Union{Missing, DateTime},1},df[:datetime])
+
+	@test missing2nan(df[:datetime]) == [DateTime(2000),DateTime(2001)]
+	@test missing2nan(df[:datetime3]) == [DateTime(2000),DateTime(2001)]
+	@test missing2nan(df[:datetime2])[1] == DateTime(2002)
+	@test ismissing(missing2nan(df[:datetime2])[2])
+	@test missing2nan(df[:grav])[2] == 3.
+	@test missing2nan(df[:pres])[1] == 1.
+	@test isnan(missing2nan(df[:grav])[1])
+	@test isnan(missing2nan(df[:pres])[2])
+	@test isnan(missing2nan(df[:temp])[1])
+	@test isnan(missing2nan(df[:temp])[1])
+
+	# input should stay unchanged
+	@test ismissing(df[:grav][1])
+	@test df[:pres][1] == 1
+	@test eltype(typeof(df[:temp])) == Missing
+
+	# test for dataframe input
+	dfout = missing2nan(df)
+
+	@test missing2nan(dfout[:datetime]) == [DateTime(2000),DateTime(2001)]
+	@test missing2nan(dfout[:datetime3]) == [DateTime(2000),DateTime(2001)]
+	@test missing2nan(dfout[:datetime2])[1] == DateTime(2002)
+	@test ismissing(missing2nan(dfout[:datetime2])[2])
+	@test missing2nan(dfout[:grav])[2] == 3.
+	@test missing2nan(dfout[:pres])[1] == 1.
+	@test isnan(missing2nan(dfout[:grav])[1])
+	@test isnan(missing2nan(dfout[:pres])[2])
+	@test isnan(missing2nan(dfout[:temp])[1])
+	@test isnan(missing2nan(dfout[:temp])[1])
+
+	# input should stay unchanged
+	@test ismissing(df[:grav][1])
+	@test df[:pres][1] == 1
+	@test eltype(typeof(df[:temp])) == Missing
+end
